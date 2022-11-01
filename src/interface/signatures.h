@@ -3,15 +3,16 @@
 
 #include <stdio.h>
 #include <inttypes.h>
+#include "configuration.h"
 
 /**
- * Container to store file parameters
- * ASCII_signature - 0xFFFE or 0xFEFF character to define little- or big- endian byte order
- * root_offset     - offset to root element
- * first_seq       - sequence that increase, when we open working file
- * second_seq      - sequence that increase, when we close working file
- * cur_id          - sequence to manage auto-incremental id
- * reserved[16]    - reserved empty space
+ * Контейнер, хранящий параметры файла
+ * ASCII_signature - 0xFFFE или 0xFEFF символы для определения little- или big- endian порядок байтов
+ * root_offset     - отступ корневого элемента
+ * first_seq       - последовательность, увеличивающаяся при открытии файла
+ * second_seq      - последовательность, увеличивающаяся при закрытии файла
+ * cur_id          - последовательность для отслеживания текущего id
+ * pattern_size    - количество полей в шаблоне вершин
  */
 struct tree_subheader {
     uint64_t ASCII_signature;
@@ -20,11 +21,19 @@ struct tree_subheader {
     uint64_t second_seq;
     uint64_t cur_id;
     uint64_t pattern_size;
-    uint64_t reserved[16];
+};
+
+enum tree_subheader_parameter {
+    PAR_ASCII_SIGNATURE = 0,
+    PAR_ROOT_OFFSET,
+    PAR_FIRST_SEQ,
+    PAR_SECOND_SEQ,
+    PAR_CURRENT_ID,
+    PAR_PATTERN_SIZE
 };
 
 /**
- * Container to store single key
+ * Контейнер для ключа шаблона
  */
 #pragma pack(push, 4)
 struct key_header {
@@ -38,8 +47,8 @@ struct key {
 #pragma pack(pop)
 
 /**
- * File-header that stores meta-data of file
- * id_sequence - array to map id of vertices on offsets
+ * Полный заголовок файла
+ * id_sequence - массив ссылок на кортежи
  */
 struct tree_header {
     struct tree_subheader *subheader;
@@ -48,8 +57,7 @@ struct tree_header {
 };
 
 /**
- * Header for each tuple with data
- * (in case when we store string in tuple we should use different variables for header)
+ * Заголовок кортежа
  */
 union tuple_header {
     struct {
@@ -63,7 +71,7 @@ union tuple_header {
 };
 
 /**
- * Basic unit of data
+ * Кортеж
  */
 struct tuple {
     union tuple_header header;
@@ -71,7 +79,7 @@ struct tuple {
 };
 
 /**
- * Structure of whole file
+ * Структура всего файла @deprecated
  */
 struct document_tree {
     struct tree_header header;

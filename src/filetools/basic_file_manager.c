@@ -1,7 +1,7 @@
 #include "basic_file_manager.h"
 
-enum file_read_status read_from_file(void *buffer, FILE *file) {
-    size_t length = fread(buffer, sizeof(buffer), 1, file);
+enum file_read_status read_from_file(void *buffer, FILE *file, size_t size) {
+    size_t length = fread(buffer, size, 1, file);
     enum file_read_status code = READ_OK;
     if (length < 1) {
         code = READ_INVALID;
@@ -11,8 +11,8 @@ enum file_read_status read_from_file(void *buffer, FILE *file) {
     return code;
 }
 
-enum file_write_status write_to_file(void *buffer, FILE *file) {
-    size_t length = fwrite(buffer, sizeof(buffer), 1, file);
+enum file_write_status write_to_file(void *buffer, FILE *file, size_t size) {
+    size_t length = fwrite(buffer, size, 1, file);
     enum file_write_status code = WRITE_OK;
     if (length < 1) {
         code = WRITE_WRONG_INTEGRITY;
@@ -22,7 +22,7 @@ enum file_write_status write_to_file(void *buffer, FILE *file) {
     return code;
 }
 
-enum file_open_status open_file(char *filename, FILE **file, char *open_descriptor){
+static enum file_open_status open_file(char *filename, FILE **file, char *open_descriptor){
     *file = fopen(filename, open_descriptor);
     enum file_open_status code = OPEN_OK;
     if (*file==NULL){
@@ -41,4 +41,10 @@ enum file_open_status open_new_file(char *filename, FILE **file){
 
 void close_file(FILE *file){
     fclose(file);
+}
+
+enum file_open_status open_empty_file(char *filename, FILE **file){
+    open_file(filename, file, "w");
+    close_file(*file);
+    return open_file(filename, file, "r+");
 }
