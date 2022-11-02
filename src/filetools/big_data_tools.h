@@ -2,9 +2,9 @@
 #define BIG_DATA_TOOLS_H
 #include <stdlib.h>
 
-#include "../../../Low_Level_Programming_lab_1/src/interface/configuration.h"
-#include "../../../Low_Level_Programming_lab_1/src/interface/signatures.h"
-#include "../../../Low_Level_Programming_lab_1/src/generator/empty_generator.h"
+#include "../interface/configuration.h"
+#include "../interface/signatures.h"
+#include "../generator/empty_generator.h"
 #include "basic_file_manager.h"
 
 size_t get_real_id_array_size(uint64_t pattern_size, uint64_t cur_id);

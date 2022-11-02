@@ -4,6 +4,7 @@
 
 
 int main(int argc, char** argv) {
+    printf("%s", "Request from 1st PC\n");
     FILE *file;
     open_empty_file("simple.txt", &file);
     char *par1 = "Code";
