@@ -58,11 +58,7 @@ enum file_read_status read_tree_header(struct tree_header *header, FILE *file, s
 enum file_read_status read_basic_tuple(struct tuple **tuple, FILE *file, uint64_t pattern_size) {
     union tuple_header *header = (union tuple_header *) malloc(sizeof(union tuple_header));
     enum file_read_status code = read_from_file(header, file, sizeof(union tuple_header));
-    if (header->alloc) {
-        *tuple = (struct tuple *)header->alloc;
-        free(header);
-        return code;
-    }
+
     fseek(file, -(sizeof(union tuple_header)), SEEK_CUR);
     struct tuple *temp_tuple = (struct tuple *) malloc(sizeof(struct tuple));
     temp_tuple->header = *header;

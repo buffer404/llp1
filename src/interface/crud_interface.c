@@ -125,8 +125,7 @@ static void append_to_result_list(struct tuple **tuple_to_add, uint64_t id, stru
     *tuple_to_add = malloc(sizeof(struct tuple));
 }
 
-enum crud_operation_status
-find_by_field(FILE *file, uint64_t field_number, uint64_t *condition, struct result_list_tuple **result) {
+enum crud_operation_status find_by_field(FILE *file, uint64_t field_number, uint64_t *condition, struct result_list_tuple **result) {
     uint32_t *types;
     size_t size;
     get_types(file, &types, &size);
