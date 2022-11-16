@@ -107,6 +107,7 @@ enum crud_operation_status remove_tuple(FILE *file, uint64_t id, uint8_t str_fla
     return CRUD_OK;
 }
 
+// find
 static void append_to_result_list(struct tuple **tuple_to_add, uint64_t id, struct result_list_tuple **result) {
     if ((*result) == NULL) {
         *result = malloc(sizeof(struct result_list_tuple));
@@ -125,6 +126,7 @@ static void append_to_result_list(struct tuple **tuple_to_add, uint64_t id, stru
     *tuple_to_add = malloc(sizeof(struct tuple));
 }
 
+// find (file, 1, 2, res) найдет все tuple, у которых 1е поле = 2, результат в res
 enum crud_operation_status find_by_field(FILE *file, uint64_t field_number, uint64_t *condition, struct result_list_tuple **result) {
     uint32_t *types;
     size_t size;

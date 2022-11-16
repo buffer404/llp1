@@ -8,6 +8,9 @@ int main(int argc, char** argv) {
     printf("%s", "Response from 2nd PC\n");
     FILE *file;
     open_empty_file("simple.txt", &file);
+
+
+    // init header
     char *par1 = "Code";
     char *par2 = "Name";
     char **pattern = malloc(sizeof(char *) * 2);
@@ -15,22 +18,26 @@ int main(int argc, char** argv) {
     pattern[1] = par2;
     size_t pattern_size = 2;
     size_t *sizes = malloc(sizeof (size_t) * 2);
-    sizes[0] = 5;
-    sizes[1] = 8;
+    sizes[0] = 4;
+    sizes[1] = 4;
     uint32_t *types = malloc(sizeof (uint32_t) * 2);
     types[0] = 1;
     types[1] = 3;
     init_empty_file(file, pattern, types, pattern_size, sizes);
 
-    uint64_t* fields = malloc(sizeof(uint64_t) + sizeof(char*));
+    // init 1st tuple
+    uint64_t* fields = malloc(sizeof(uint64_t) * 2); // tuple data
     fields[0] = 1024;
     char* str = "Мега";
     fields[1] = (uint64_t) str;
     add_tuple(file, fields, 1298);
+
+    // init 2nd tuple
     fields[0] = 123;
     str = "Чепух";
     fields[1] = (uint64_t) str;
     add_tuple(file, fields, 3);
+
     remove_tuple(file, 0, 0);
 
     print_tree_header_from_file(file);
