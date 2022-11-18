@@ -1,17 +1,17 @@
 #include "big_data_tools.h"
 #include "../interface/basic_crud.h"
 
-size_t get_real_tuple_size(uint64_t pattern_size) {
-    return pattern_size * SINGLE_TUPLE_VALUE_SIZE < MINIMAL_TUPLE_SIZE
-           ? MINIMAL_TUPLE_SIZE
-           : pattern_size * SINGLE_TUPLE_VALUE_SIZE;
-}
-
 size_t get_real_id_array_size(uint64_t pattern_size, uint64_t cur_id){
     size_t real_tuple_size = get_real_tuple_size(pattern_size);
     if (cur_id == 0) cur_id++;
     return (cur_id * OFFSET_VALUE_SIZE / real_tuple_size) * real_tuple_size +
-        cur_id * OFFSET_VALUE_SIZE % real_tuple_size ? real_tuple_size : 0;
+           cur_id * OFFSET_VALUE_SIZE % real_tuple_size ? real_tuple_size : 0;
+}
+
+size_t get_real_tuple_size(uint64_t pattern_size) {
+    return pattern_size * SINGLE_TUPLE_VALUE_SIZE < MINIMAL_TUPLE_SIZE
+           ? MINIMAL_TUPLE_SIZE
+           : pattern_size * SINGLE_TUPLE_VALUE_SIZE;
 }
 
 static enum file_read_status read_tree_subheader(struct tree_subheader *header, FILE *file) {
@@ -19,6 +19,12 @@ static enum file_read_status read_tree_subheader(struct tree_subheader *header, 
     return code;
 }
 
+/**
+ * Чтение текущего паттерна
+ * @param key структура паттерна куда будет записан паттерн
+ * @param file название файла
+ * @return статус записи
+ */
 static enum file_read_status read_key(struct key *key, FILE *file) {
     struct key_header *header = malloc(sizeof(struct key_header));
     enum file_read_status code = read_from_file(header, file, sizeof(struct key_header));
@@ -203,29 +209,29 @@ void print_tree_header_from_file(FILE *file) {
     }
 }
 
-    void print_tuple_array_from_file(FILE *file){
-        struct tree_header *header = malloc(sizeof(struct tree_header));
-        size_t pos;
-        read_tree_header(header, file, &pos);
-        uint32_t* fields;
-        size_t size;
-        get_types(file, &fields, &size);
-        struct tuple* cur_tuple = malloc(sizeof(struct tuple));
+void print_tuple_array_from_file(FILE *file){
+    struct tree_header *header = malloc(sizeof(struct tree_header));
+    size_t pos;
+    read_tree_header(header, file, &pos);
+    uint32_t* fields;
+    size_t size;
+    get_types(file, &fields, &size);
+    struct tuple* cur_tuple = malloc(sizeof(struct tuple));
 
-        for(size_t i = 0; i < header->subheader->cur_id; i++){
-            if (header->id_sequence[i] == NULL_VALUE) continue;
-            fseek(file, header->id_sequence[i], SEEK_SET);
-            read_basic_tuple(&cur_tuple, file, header->subheader->pattern_size);
-            printf("--- TUPLE %3zu ---\n", i);
-            for(size_t iter = 0; iter < size; iter++){
-                if (header->pattern[iter]->header->type == STRING_TYPE){
-                    char *s;
-                    read_string_from_tuple(file, &s, header->subheader->pattern_size, cur_tuple->data[iter]);
-                    printf("%-20s %s\n", header->pattern[iter]->key_value, s);
-                } else {
-                    printf("%-20s %lu\n", header->pattern[iter]->key_value, cur_tuple->data[iter]);
-                }
+    for(size_t i = 0; i < header->subheader->cur_id; i++){
+        if (header->id_sequence[i] == NULL_VALUE) continue;
+        fseek(file, header->id_sequence[i], SEEK_SET);
+        read_basic_tuple(&cur_tuple, file, header->subheader->pattern_size);
+        printf("--- TUPLE %3zu ---\n", i);
+        for(size_t iter = 0; iter < size; iter++){
+            if (header->pattern[iter]->header->type == STRING_TYPE){
+                char *s;
+                read_string_from_tuple(file, &s, header->subheader->pattern_size, cur_tuple->data[iter]);
+                printf("%-20s %s\n", header->pattern[iter]->key_value, s);
+            } else {
+                printf("%-20s %lu\n", header->pattern[iter]->key_value, cur_tuple->data[iter]);
             }
-
         }
+
     }
+}

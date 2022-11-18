@@ -55,7 +55,6 @@ enum crud_operation_status remove_tuple(FILE *file, uint64_t id, uint8_t str_fla
     if (!str_flag) {
         uint64_t offset;
         if (remove_from_id_array(file, id, &offset) == CRUD_INVALID) {
-            // invalid id
             return CRUD_INVALID;
         }
 

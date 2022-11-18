@@ -7,7 +7,13 @@
 #include "../generator/empty_generator.h"
 #include "basic_file_manager.h"
 
+/**
+ * Получение реального размера массива линков
+ * @param pattern_size размер массива шаблона
+ * @return размер внутренних данных кортежа
+ */
 size_t get_real_id_array_size(uint64_t pattern_size, uint64_t cur_id);
+
 /**
  * Получение реального размера кортежа
  * @param pattern_size размер массива шаблона
@@ -16,20 +22,49 @@ size_t get_real_id_array_size(uint64_t pattern_size, uint64_t cur_id);
 size_t get_real_tuple_size(uint64_t pattern_size);
 
 /**
- * Запись кортежа в файл
+ * Прочитать полный заголовок файла
+ * @param tree_header заголовок файла
  * @param file файл
- * @param tuple кортеж
- * @return статус записи
+ * @param fpos
+ * @return статус чтения
  */
-enum file_write_status write_tuple(FILE *file, struct tuple *tuple, size_t tuple_size);
+enum file_read_status read_tree_header(struct tree_header *header, FILE *file, size_t *fpos);
 
 /**
- * Открытие файла или его создание в случае его отсутствия
- * @param file контейнер для файлового потока
- * @param filename имя файла
- * @return статус открытия
+ * Прочитать обычный кортеж
+ * @param tuple контейнер для кортежа
+ * @param file файл
+ * @param tree_header заголовок
+ * @return статус чтения
  */
-enum file_open_status open_file_anyway(FILE **file, char *filename);
+enum file_read_status read_basic_tuple(struct tuple **tuple, FILE *file, uint64_t pattern_size);
+
+/**
+ * Прочитать строчный кортеж
+ * @param tuple контейнер для кортежа
+ * @param file файл
+ * @param tree_header заголовок дерева
+ * @return статус чтения
+ */
+enum file_read_status read_string_tuple(struct tuple **tuple, FILE *file, uint64_t pattern_size);
+
+/**
+ * Получить строку
+ * @param string контейнер для строки
+ * @param pattern_size размер кортежа, в которм хранится строка
+ * @param offset смещение, где находится начало строки
+ * @return статус чтения
+ */
+enum file_read_status read_string_from_tuple(FILE *file, char **string, uint64_t pattern_size, uint64_t offset);
+
+/**
+ * Записать заголовок файла
+ * @param file файл
+ * @param header заголовок файла
+ * @param pattern_size размер массива шаблона
+ * @return статус записи
+ */
+enum file_write_status write_tree_header(FILE *file, struct tree_header *header);
 
 /**
  * Создать файл с пустой структурой
@@ -43,43 +78,22 @@ enum file_open_status open_file_anyway(FILE **file, char *filename);
 enum file_write_status init_empty_file(FILE *file, char **pattern, uint32_t *types, size_t pattern_size, size_t *key_sizes);
 
 /**
- * Записать заголовок файла
+ * Открытие файла или его создание в случае его отсутствия
+ * @param file контейнер для файлового потока
+ * @param filename имя файла
+ * @return статус открытия
+ */
+enum file_open_status open_file_anyway(FILE **file, char *filename);
+
+/**
+ * Запись кортежа в файл
  * @param file файл
- * @param header заголовок файла
- * @param pattern_size размер массива шаблона
+ * @param tuple кортеж
  * @return статус записи
  */
-enum file_write_status write_tree_header(FILE *file, struct tree_header *header);
+enum file_write_status write_tuple(FILE *file, struct tuple *tuple, size_t tuple_size);
 
-/**
- * Прочитать строчный кортеж
- * @param tuple контейнер для кортежа
- * @param file файл
- * @param tree_header заголовок дерева
- * @return статус чтения
- */
-enum file_read_status read_string_tuple(struct tuple **tuple, FILE *file, uint64_t pattern_size);
-
-/**
- * Прочитать обычный кортеж
- * @param tuple контейнер для кортежа
- * @param file файл
- * @param tree_header заголовок
- * @return статус чтения
- */
-enum file_read_status read_basic_tuple(struct tuple **tuple, FILE *file, uint64_t pattern_size);
-
-/**
- * Прочитать заголовок файла
- * @param header контейнер для заголовка
- * @param file файл
- * @param fpos контейнер для позиции окончания чтения файла
- * @return статус чтения
- */
-enum file_read_status read_tree_header(struct tree_header *header, FILE *file, size_t *fpos);
 void print_tree_header_from_file(FILE *file);
 void print_tuple_array_from_file(FILE *file);
-enum file_read_status read_string_from_tuple(FILE *file, char **string, uint64_t pattern_size, uint64_t offset);
-enum file_write_status write_tuple(FILE *file, struct tuple *tuple, size_t tuple_size);
 
 #endif

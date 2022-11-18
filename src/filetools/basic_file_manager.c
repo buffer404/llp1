@@ -44,7 +44,7 @@ void close_file(FILE *file){
 }
 
 enum file_open_status open_empty_file(char *filename, FILE **file){
-    open_file(filename, file, "w");
-    close_file(*file);
+    //open_file(filename, file, "w");
+    //close_file(*file);
     return open_file(filename, file, "r+");
 }

@@ -7,6 +7,7 @@
 #define NULL_VALUE 0
 #define BIG_ENDIAN_SIGNATURE 0xFFFE
 #define PRINT_ID_ARRAY_LEN 16
+
 #define BOOLEAN_TYPE 0
 #define INTEGER_TYPE 1
 #define FLOAT_TYPE 2

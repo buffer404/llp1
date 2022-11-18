@@ -25,8 +25,10 @@ int main(int argc, char** argv) {
     types[1] = 3;
     init_empty_file(file, pattern, types, pattern_size, sizes);
 
+    // tuple data
+    uint64_t* fields = malloc(sizeof(uint64_t) * 2);
+
     // init 1st tuple
-    uint64_t* fields = malloc(sizeof(uint64_t) * 2); // tuple data
     fields[0] = 1024;
     char* str = "Мега";
     fields[1] = (uint64_t) str;
@@ -38,7 +40,9 @@ int main(int argc, char** argv) {
     fields[1] = (uint64_t) str;
     add_tuple(file, fields, 3);
 
-    remove_tuple(file, 0, 0);
+    fields[0] = 666;
+    update_tuple(file, 0, &fields[0], 0);
+
 
     print_tree_header_from_file(file);
     print_tuple_array_from_file(file);
