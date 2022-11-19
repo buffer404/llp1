@@ -1,9 +1,11 @@
 #include "ui/interactive.h"
 #include "interface/basic_crud.h"
 #include "interface/crud_interface.h"
+#include "data/test_data.h"
 
 
 int main(int argc, char** argv) {
+    //get_test_data(3, 100);
     printf("%s", "Request from 1st PC\n");
     printf("%s", "Response from 2nd PC\n");
     FILE *file;
@@ -18,11 +20,11 @@ int main(int argc, char** argv) {
     pattern[1] = par2;
     size_t pattern_size = 2;
     size_t *sizes = malloc(sizeof (size_t) * 2);
-    sizes[0] = 4;
-    sizes[1] = 4;
+    sizes[0] = 4; //len 1st par
+    sizes[1] = 4; //len 2nd par
     uint32_t *types = malloc(sizeof (uint32_t) * 2);
-    types[0] = 1;
-    types[1] = 3;
+    types[0] = 1; // int
+    types[1] = 3; // string
     init_empty_file(file, pattern, types, pattern_size, sizes);
 
     // tuple data
