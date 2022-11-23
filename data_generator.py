@@ -29,6 +29,7 @@ def check_count(count):
 def create_data(data_type, count):
     data = ''
     for iter in range(count):
+        random.seed(iter)
         if iter == 0:
             data += str(0) + ' '
         else:
@@ -49,7 +50,7 @@ def get_random_integer(max_value):
 
 
 def get_random_float():
-    round(random.uniform(1, 100), 5)
+    return round(random.uniform(1, 100), 5)
 
 
 def get_random_boolean():
@@ -57,7 +58,8 @@ def get_random_boolean():
 
 
 def create_file(data):
-    file = open("./data.txt", "w+")
+    file = open("../data_generator/data.txt", "w+")
+    file.write(sys.argv[1] + ' ' + sys.argv[2] + '\n')
     file.write(data)
     file.close()
 

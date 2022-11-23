@@ -6,48 +6,64 @@
 
 int main(int argc, char** argv) {
     //get_test_data(3, 100);
-    printf("%s", "Request from 1st PC\n");
-    printf("%s", "Response from 2nd PC\n");
     FILE *file;
     open_empty_file("simple.txt", &file);
+    printf("%d", 1);
+    char** data_name = get_test_data_name();
+    free(data_name);
+
+   // printf("%lu", strlen(data_name));
+   // char **pattern = malloc(sizeof(char *) * strlen(data_name));
 
 
-    // init header
-    char *par1 = "Code";
-    char *par2 = "Name";
-    char **pattern = malloc(sizeof(char *) * 2);
-    pattern[0] = par1;
-    pattern[1] = par2;
-    size_t pattern_size = 2;
-    size_t *sizes = malloc(sizeof (size_t) * 2);
-    sizes[0] = 4; //len 1st par
-    sizes[1] = 4; //len 2nd par
-    uint32_t *types = malloc(sizeof (uint32_t) * 2);
-    types[0] = 1; // int
-    types[1] = 3; // string
-    init_empty_file(file, pattern, types, pattern_size, sizes);
+//    // init header
+//    char *par1 = "Code";
+//    char *par2 = "Name";
+//    char **pattern = malloc(sizeof(char *) * 2);
+//    pattern[0] = par1;
+//    pattern[1] = par2;
+//    size_t pattern_size = 2;
+//    size_t *sizes = malloc(sizeof (size_t) * 2);
+//    sizes[0] = 4; //len 1st par
+//    sizes[1] = 4; //len 2nd par
+//    uint32_t *types = malloc(sizeof (uint32_t) * 2);
+//    types[0] = 1; // int
+//    types[1] = 3; // string
+//    init_empty_file(file, pattern, types, pattern_size, sizes);
+//
+//
+//
+//
+//
+//
+//    // tuple data
+//    uint64_t* fields = malloc(sizeof(uint64_t) * 2);
+//
+//    // init 1st tuple
+//    fields[0] = 1024;
+//    char* str = "Мега";
+//    fields[1] = (uint64_t) str;
+//    add_tuple(file, fields, 1298);
+//
+//    // init 2nd tuple
+//    fields[0] = 123;
+//    str = "Чепух";
+//    fields[1] = (uint64_t) str;
+//    add_tuple(file, fields, 3);
+//
+//    fields[0] = 666;
+//    update_tuple(file, 0, &fields[0], 0);
+//
+//
+//    print_tree_header_from_file(file);
+//    print_tuple_array_from_file(file);
 
-    // tuple data
-    uint64_t* fields = malloc(sizeof(uint64_t) * 2);
-
-    // init 1st tuple
-    fields[0] = 1024;
-    char* str = "Мега";
-    fields[1] = (uint64_t) str;
-    add_tuple(file, fields, 1298);
-
-    // init 2nd tuple
-    fields[0] = 123;
-    str = "Чепух";
-    fields[1] = (uint64_t) str;
-    add_tuple(file, fields, 3);
-
-    fields[0] = 666;
-    update_tuple(file, 0, &fields[0], 0);
 
 
-    print_tree_header_from_file(file);
-    print_tuple_array_from_file(file);
+
+
+
+
 //    uint64_t *fieldss;
 //    get_tuple(file, &fieldss, 0);
 //

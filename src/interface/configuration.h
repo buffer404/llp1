@@ -13,4 +13,6 @@
 #define FLOAT_TYPE 2
 #define STRING_TYPE 3
 
+#define MAX_STRING_LEN 25
+
 #endif
