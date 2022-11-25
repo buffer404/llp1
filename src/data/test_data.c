@@ -1,42 +1,28 @@
 #include "test_data.h"
 
-char** get_test_data_name(void){
-
+int get_string_count(size_t* pattern_size){
     FILE *df = open_file();
-    char* data = get_input(df);
 
-    int len_count = get_string_count(data);
+    char* cur_line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    read = getline(&cur_line, &len, df);
 
-    char** data_name;
+    char* space = strchr(cur_line, ' ');
+    *pattern_size = atoi(substr(cur_line, space-cur_line, strlen(cur_line)));
 
-    const size_t row_pointers_bytes = MAX_STRING_LEN * sizeof *data_name;
-    const size_t row_elements_bytes = len_count * sizeof **data_name;
-    data_name = malloc(row_pointers_bytes + MAX_STRING_LEN * row_elements_bytes);
+    int result = get_type(substr(cur_line, 0, space-cur_line));
 
-    printf("%d", 1);
-    int cur_pos = 0;
-    for (int i = 0; i < len_count; ++i) {
-        int k = 0;
-        while (data[cur_pos] != '='){
-            cur_pos++;
-        }
-        cur_pos++;
-        while (data[cur_pos] != '='){
-            cur_pos++;
-        }
-        printf("1");
-        cur_pos++;
-        while (data[cur_pos] != '\n'){
-            data_name[i][k] = data[cur_pos];
-            cur_pos++;
-            k++;
-            printf("%c\n", data_name[i][k]);
-        }
-    }
+    fclose(df);
 
+    return result;
+}
 
-    free(data);
-    return data_name;
+void get_test_data(char **pattern, size_t *sizes, uint64_t* fields, uint64_t* parent_id, int type){
+    FILE *df = open_file();
+    get_input(df, pattern,  sizes, fields, parent_id, type);
+
+    fclose(df);
 }
 
 FILE *open_file(){
@@ -48,41 +34,85 @@ FILE *open_file(){
     }
 }
 
-char* get_input(FILE *df){
+void get_input(FILE *df, char **pattern, size_t *sizes, uint64_t* fields, uint64_t* parent_id, int type){
     char* cur_line = NULL;
     size_t len = 0;
     ssize_t read;
     size_t m_size = 1;
-
-    char *result = malloc(1);
+    int first_string = -1;
 
     while ((read = getline(&cur_line, &len, df)) != -1) {
-        m_size += read;
-        result = realloc(result, m_size * sizeof (char));
-        strcat(result, cur_line);
+        if (first_string != -1){
+            char* first_space = strchr(cur_line, ' ');
+            char* second_space = strrchr(cur_line, ' ');
+            char* equally = strchr(cur_line, '=');
+            char* second_equally = strrchr(cur_line, '=');
+
+            parent_id[first_string] = atoi(substr(cur_line, 0, first_space-cur_line));
+
+            fields[first_string] = get_field(type, substr(cur_line, equally-cur_line+1, second_space-cur_line));
+
+            sizes[first_string] = strlen(substr(cur_line, second_equally-cur_line+1, strlen(cur_line)-2));
+
+            pattern[first_string] = substr(cur_line, second_equally-cur_line+1, strlen(cur_line)-1);
+
+        }
+        first_string++;
     }
 
-    return result;
 }
 
-char get_string_count(char *data){
-    int position = 0;
+char* substr(const char *src, int m, int n) {
+    // get the length of the destination string
+    int len = n - m;
 
-    while (data[position] != ' '){
-        position++;
+    // allocate (len + 1) chars for destination (+1 for extra null character)
+    char *dest = (char*)malloc(sizeof(char) * (len + 1));
+
+    // extracts characters between m'th and n'th index from source string
+    // and copy them into the destination string
+    for (int i = m; i < n && (*(src + i) != '\0'); i++)
+    {
+        *dest = *(src + i);
+        dest++;
     }
-    position++;
-    int p2 = position;
-    while (data[position] != '\n'){
-        position++;
+
+    // null-terminate the destination string
+    *dest = '\0';
+
+    // return the destination string
+    return dest - len;
+}
+
+uint64_t get_field(int type, char* str){
+    switch (type) {
+        case 0:
+            return (uint64_t) str;
+        case 1:
+            return (uint64_t) atoi(str);
+        case 2:
+            return (uint64_t) atof(str);
+        case 3:
+            return (uint64_t) str;
+        default:
+            printf ("Неверный формат входных данных \n");
+            _Exit (EXIT_FAILURE);
     }
-    char result[position - p2];
-    for (int i = 0; i < strlen(result); ++i) {
-        result[i] = data[p2];
-        p2++;
+}
+
+int get_type(char* str_type){
+    if (!strcmp(str_type, "Boolean")){
+        return 0;
+    } else if (!strcmp(str_type, "Integer")){
+        return 1;
+    } else if (!strcmp(str_type, "Float")){
+        return 2;
+    } else if (!strcmp(str_type, "String")){
+        return 3;
+    } else{
+        printf ("Неверный формат входных данных \n");
+        _Exit (EXIT_FAILURE);
     }
-    //printf("%s", result);
-    return atoi(result);
 }
 
 void check_input();

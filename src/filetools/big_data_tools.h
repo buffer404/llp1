@@ -93,6 +93,9 @@ enum file_open_status open_file_anyway(FILE **file, char *filename);
  */
 enum file_write_status write_tuple(FILE *file, struct tuple *tuple, size_t tuple_size);
 
+
+static enum file_write_status write_pattern(FILE *file, struct key **pattern, size_t pattern_size);
+
 void print_tree_header_from_file(FILE *file);
 void print_tuple_array_from_file(FILE *file);
 

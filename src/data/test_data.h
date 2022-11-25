@@ -6,15 +6,20 @@
 #include <string.h>
 #include "../interface/configuration.h"
 
-char** get_test_data_name();
+void get_test_data(char **pattern, size_t *sizes, uint64_t* fields, uint64_t* parent_id, int type);
 
 FILE *open_file();
 
-char* get_input();
+void get_input(FILE *df, char **pattern, size_t *sizes, uint64_t* fields, uint64_t* parent_id, int type);
 
 void check_input();
 
-char get_string_count(char *data);
+int get_string_count(size_t* pattern_size);
 
+char* substr(const char *src, int m, int n);
+
+int get_type(char* str_type);
+
+uint64_t get_field(int type, char* str);
 
 #endif //LLP1_TEST_DATA_H
