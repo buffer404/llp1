@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=--std=c17 -Wall -pedantic -Isrc/ -ggdb -Wextra -Werror -DDEBUG
+CFLAGS= -Wall -Isrc/ -Wextra -DDEBUG -g -o0
 
 BUILDDIR=build
 SRCDIR=src
@@ -17,7 +17,7 @@ run:
 build: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(SOURCES)
-	$(CC) $(SOURCES) -o $@
+	$(CC) $(CFLAGS) $(SOURCES) -o $@
 
 clean:
 	rm -rf $(BUILDDIR) $(EXECUTABLE)

@@ -1,4 +1,6 @@
 .idea
-src/.idea/
+data_generator/
+*.docx
+src/.idea/.idea
 cmake-build-debug/
 main

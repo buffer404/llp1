@@ -9,32 +9,21 @@ int main(int argc, char** argv) {
     open_empty_file("simple.txt", &file);
 
     size_t* pattern_size = malloc(sizeof(size_t));
+    size_t* tuple_count = malloc(sizeof(size_t));
 
-    int type_data = get_string_count(pattern_size);
+    char **pattern;
+    uint32_t *types;
+    size_t *sizes;
 
-    char **pattern = malloc(sizeof(char *) * (*pattern_size));
-    uint32_t *types = malloc(sizeof (uint32_t) * 1);
-    size_t *sizes = malloc(sizeof (size_t) * (*pattern_size));
-    uint64_t* fields = malloc(sizeof(uint64_t) * (*pattern_size));
-    uint64_t* parent_id = malloc(sizeof(uint64_t) * (*pattern_size));
+    get_test_header(&pattern, &types, pattern_size, &sizes, tuple_count);
 
-    types[0] = type_data;
-
-    get_test_data(pattern, sizes, fields, parent_id, type_data);
-
-    init_empty_file(file, &pattern[0], types, 1, &sizes[0]);
+    init_empty_file(file, pattern, types, *pattern_size, sizes);
 
 
 
-    //uint64_t* test = malloc(sizeof(uint64_t) );
-    //test[0] = 1025;
-//
+    get_test_data(file, *tuple_count, *pattern_size, types);
 
-    add_tuple(file, &fields[0], parent_id[0]);
-
-    for (int i = 0; i < *pattern_size-1; ++i) {
-        add_tuple(file, &fields[i], parent_id[i]);
-    }
+    //add_tuple(file, fields, parent_id);
 
     print_tree_header_from_file(file);
     print_tuple_array_from_file(file);
@@ -50,9 +39,6 @@ int main(int argc, char** argv) {
 
 
 
-
-   // printf("%lu", strlen(data_name));
-   // char **pattern = malloc(sizeof(char *) * strlen(data_name));
 
 
 //    // init header
