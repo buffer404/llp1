@@ -1,5 +1,5 @@
 .idea
-data_generator/
+data_generator/.idea
 *.docx
 src/.idea/.idea
 cmake-build-debug/

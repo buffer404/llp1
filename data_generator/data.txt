@@ -1,0 +1,11 @@
+10 string:name integer:age float:height boolean:male
+0 name=llietkzbqbxmxyhawejl age=20358 height=19.56109 male=True
+0 name=wpmofogkmptclhwtrawu age=9946 height=29.23968 male=False
+1 name=wvsyoscrfigwrmbcvuhx age=72353 height=22.072 male=True
+0 name=trogzkfwidvcektonytw age=32266 height=37.23714 male=True
+1 name=xteodpkpmpkoxhbrsuxn age=54033 height=46.48207 male=True
+0 name=rgjnrxhojlmrategczgf age=85357 height=16.06775 male=True
+4 name=kwfqfmsifjdmrqqpqerp age=65758 height=1.17594 male=False
+0 name=jrdoqwdmempppbjodkix age=18274 height=90.81714 male=True
+4 name=gfipavndvbubkszvqgqg age=68023 height=19.51944 male=True
+5 name=osygioxyxrpznliwxllo age=92548 height=24.82019 male=True
