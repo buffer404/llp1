@@ -168,11 +168,11 @@ enum crud_operation_status change_parameter(FILE *file, enum tree_subheader_para
 }
 
 size_t append_to_id_array(FILE *file, uint64_t offset) {
+
     size_t id;
     struct tree_header *header = malloc_test(sizeof(struct tree_header));
     read_tree_header(header, file);
     uint64_t from = ftell(file);
-
     uint64_t real_tuple_size = get_id_array_size(header->subheader->pattern_size, header->subheader->cur_id);
 
     if (!((header->subheader->cur_id + 1) % real_tuple_size)){
