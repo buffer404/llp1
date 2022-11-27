@@ -14,11 +14,7 @@ int main(int argc, char** argv) {
 
     get_test_header(&pattern, &types, pattern_size, &sizes, tuple_count);
 
-    init_empty_file(file, pattern, types, *pattern_size, sizes);
-
     get_test_data(file, *tuple_count, *pattern_size, types);
-
-    //remove_tuple(file, 1, 1);
 
     print_tree_header_from_file(file);
 

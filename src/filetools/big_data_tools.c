@@ -148,32 +148,43 @@ enum file_read_status read_string_from_tuple(FILE *file, char **string, uint64_t
 
 
 
-static enum file_write_status write_tree_subheader(FILE *file, struct tree_subheader *subheader){
-    enum file_write_status code = write_to_file(subheader, file, sizeof(struct tree_subheader));
+enum file_write_status write_tree_subheader(FILE *file, struct tree_subheader *subheader) {
+    enum file_write_status code = write_to_file(file, subheader, sizeof(struct tree_subheader));
     return code;
 }
 
-static enum file_write_status write_pattern(FILE *file, struct key **pattern, size_t pattern_size){
+enum file_write_status write_pattern(FILE *file, struct key **pattern, size_t pattern_size) {
     enum file_write_status code = NULL_VALUE;
-    for (; pattern_size-- > 0; pattern++){
-        code |= write_to_file((*pattern)->header, file, sizeof(struct key_header));
-        code |= write_to_file((*pattern)->key_value, file, (*pattern)->header->size);
+    for (; pattern_size-- > 0; pattern++) {
+        code |= write_to_file(file, (*pattern)->header, sizeof(struct key_header));
+        code |= write_to_file(file, (*pattern)->key_value, (*pattern)->header->size);
     }
     return code;
 }
 
-static enum file_write_status write_id_sequence(FILE *file, uint64_t *id_sequence, size_t size){
-    enum file_write_status code = write_to_file(id_sequence, file, size);
+enum file_write_status write_id_sequence(FILE *file, uint64_t *id_sequence, size_t size) {
+    enum file_write_status code = write_to_file(file, id_sequence, size);
     return code;
 }
 
-enum file_write_status write_tree_header(FILE *file, struct tree_header *header){
+enum file_write_status write_tree_header(FILE *file, struct tree_header *header) {
     fseek(file, 0, SEEK_SET);
     size_t pattern_size = header->subheader->pattern_size;
+
     enum file_write_status code = write_tree_subheader(file, header->subheader);
+    if (code != WRITE_OK){
+        printf("WRITE ERROR\n");
+    }
+
+    fseek(file, sizeof(struct tree_subheader), SEEK_SET);
     code |= write_pattern(file, header->pattern, pattern_size);
-    size_t real_id_array_size = get_real_id_array_size(header->subheader->pattern_size, header->subheader->cur_id);
+    size_t real_id_array_size = get_id_array_size(header->subheader->pattern_size, header->subheader->cur_id);
     code |= write_id_sequence(file, header->id_sequence, real_id_array_size * sizeof(uint64_t));
+
+
+    if (code == CRUD_INVALID){
+        printf("WRITE ERROR\n");
+    }
     return code;
 }
 
@@ -191,13 +202,13 @@ enum file_open_status open_file_anyway(FILE **file, char *filename){
     }
     return code;
 }
-
-enum file_write_status write_tuple(FILE *file, struct tuple *tuple, size_t tuple_size){
-    union tuple_header *tuple_header = malloc(sizeof(union  tuple_header));
+enum file_write_status write_tuple(FILE *file, struct tuple *tuple, size_t tuple_size) {
+    union tuple_header *tuple_header = malloc_test(sizeof(union tuple_header));
     *tuple_header = tuple->header;
-    enum file_write_status code = write_to_file(tuple_header, file, sizeof(union  tuple_header));
-    free(tuple_header);
-    code |= write_to_file(tuple->data, file, tuple_size);
+    enum file_write_status code = write_to_file(file, tuple_header, sizeof(union tuple_header));
+    free_test(tuple_header);
+
+    code |= write_to_file(file, tuple->data, tuple_size);
     return code;
 }
 

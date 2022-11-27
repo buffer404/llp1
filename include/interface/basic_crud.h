@@ -62,7 +62,7 @@ enum crud_operation_status change_parameter(FILE *file, enum tree_subheader_para
  * @param offset смещение на последний id link
  * @return
  */
-enum crud_operation_status append_to_id_array(FILE *file, uint64_t offset);
+size_t append_to_id_array(FILE *file, uint64_t offset);
 
 /**
  * Заменяет ссылку в id_sequence[id] с реального значения но 0
@@ -103,6 +103,7 @@ enum crud_operation_status offset_to_id(FILE *file, uint64_t* id, uint64_t offse
 enum crud_operation_status change_string_tuple(FILE *file, uint64_t offset, char *new_string,  uint64_t size);
 
 enum crud_operation_status link_strings_to_tuple(FILE *file, struct tuple *tpl, uint64_t tpl_offset);
+
 
 /**
  * Статус операции

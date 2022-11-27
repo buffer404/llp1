@@ -90,12 +90,14 @@ enum crud_operation_status swap_tuple_to(FILE *file, uint64_t pos_to, uint64_t p
     return CRUD_OK;
 }
 
-enum crud_operation_status insert_new_tuple(FILE *file, struct tuple *tuple, size_t full_tuple_size, uint64_t *tuple_pos) {
+enum crud_operation_status
+insert_new_tuple(FILE *file, struct tuple *tuple, size_t full_tuple_size, uint64_t *tuple_pos) {
     fseek(file, 0, SEEK_END);
     *tuple_pos = ftell(file);
     int fd = fileno(file);
     ftruncate(fd, ftell(file) + full_tuple_size);
-    return (enum crud_operation_status) write_tuple(file, tuple, full_tuple_size - sizeof(union tuple_header));
+    enum file_write_status status = write_tuple(file, tuple, full_tuple_size - sizeof(union tuple_header));
+    return status == WRITE_OK ? CRUD_OK : CRUD_INVALID;
 }
 
 
@@ -165,16 +167,41 @@ enum crud_operation_status change_parameter(FILE *file, enum tree_subheader_para
     return 0;
 }
 
-enum crud_operation_status append_to_id_array(FILE *file, uint64_t offset) {
-    fseek(file, 0, SEEK_SET);
-    struct tree_header *header = malloc(sizeof(struct tree_header));
-    size_t pos;
+size_t append_to_id_array(FILE *file, uint64_t offset) {
+    size_t id;
+    struct tree_header *header = malloc_test(sizeof(struct tree_header));
     read_tree_header(header, file);
+    uint64_t from = ftell(file);
+
+    uint64_t real_tuple_size = get_id_array_size(header->subheader->pattern_size, header->subheader->cur_id);
+
+    if (!((header->subheader->cur_id + 1) % real_tuple_size)){
+        fseek(file, 0, SEEK_END);
+        uint64_t cur_end = ftell(file);
+        ftruncate(fileno(file), cur_end + get_real_tuple_size(header->subheader->pattern_size) + sizeof(union tuple_header));
+
+        swap_tuple_to(file, cur_end, from, get_real_tuple_size(header->subheader->pattern_size));
+
+
+
+        free_test_tree_header(header);
+        header = malloc_test(sizeof(struct tree_header));
+        read_tree_header(header, file);
+    }
+
+
     header->id_sequence[header->subheader->cur_id] = offset;
     header->subheader->cur_id++;
-    write_tree_header(file, header);
-    free(header);
-    return 0;
+    id = header->subheader->cur_id - 1;
+
+    fseek(file, 0, SEEK_SET);
+    if (write_tree_header(file, header) != WRITE_OK){
+        printf("WRITE ERROR\n");
+    }
+
+    free_test_tree_header(header);
+
+    return id;
 }
 
 enum crud_operation_status remove_from_id_array(FILE *file, uint64_t id, uint64_t* offset) {

@@ -21,7 +21,7 @@ size_t get_real_id_array_size(uint64_t pattern_size, uint64_t cur_id);
  */
 size_t get_real_tuple_size(uint64_t pattern_size);
 
-
+size_t get_id_array_size(uint64_t pattern_size, uint64_t cur_id);
 
 /**
  * Прочитать обычный кортеж
