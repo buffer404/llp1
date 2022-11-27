@@ -1,6 +1,6 @@
 #ifndef LLP1_TEST_DATA_H
 #define LLP1_TEST_DATA_H
-#include "interface/crud_interface.h"
+#include "../interface/crud_interface.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
@@ -16,15 +16,19 @@ FILE *open_file();
 
 char* get_cur_line(FILE *df);
 
+void init_header_param(char *cur_line, size_t* tuple_count, size_t* pattern_size);
+
+void malloc_header_struct(size_t* pattern_size, char ***pattern, uint32_t **types, size_t **sizes);
+
 void check_input();
 
 int get_string_count(size_t* pattern_size);
 
 char* substr(const char *src, int m, int n);
 
-int get_type(char* str_type);
+int get_type_from_string(char* str_type);
 
-uint64_t get_field(int type, char* str);
+uint64_t get_real_tuple_attr(int type, char *attr);
 
 int get_space_count(char* string);
 

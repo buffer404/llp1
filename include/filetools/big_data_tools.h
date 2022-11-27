@@ -21,14 +21,7 @@ size_t get_real_id_array_size(uint64_t pattern_size, uint64_t cur_id);
  */
 size_t get_real_tuple_size(uint64_t pattern_size);
 
-/**
- * Прочитать полный заголовок файла
- * @param tree_header заголовок файла
- * @param file файл
- * @param fpos
- * @return статус чтения
- */
-enum file_read_status read_tree_header(struct tree_header *header, FILE *file, size_t *fpos);
+
 
 /**
  * Прочитать обычный кортеж
@@ -37,7 +30,7 @@ enum file_read_status read_tree_header(struct tree_header *header, FILE *file, s
  * @param tree_header заголовок
  * @return статус чтения
  */
-enum file_read_status read_basic_tuple(struct tuple **tuple, FILE *file, uint64_t pattern_size);
+
 
 /**
  * Прочитать строчный кортеж
@@ -46,7 +39,7 @@ enum file_read_status read_basic_tuple(struct tuple **tuple, FILE *file, uint64_
  * @param tree_header заголовок дерева
  * @return статус чтения
  */
-enum file_read_status read_string_tuple(struct tuple **tuple, FILE *file, uint64_t pattern_size);
+enum file_read_status read_string_tuple(FILE *file, struct tuple **tuple, uint64_t pattern_size);
 
 /**
  * Получить строку
@@ -93,10 +86,23 @@ enum file_open_status open_file_anyway(FILE **file, char *filename);
  */
 enum file_write_status write_tuple(FILE *file, struct tuple *tuple, size_t tuple_size);
 
+enum file_read_status read_basic_tuple(FILE *file, struct tuple **tuple, uint64_t pattern_size);
 
 static enum file_write_status write_pattern(FILE *file, struct key **pattern, size_t pattern_size);
 
 void print_tree_header_from_file(FILE *file);
 void print_tuple_array_from_file(FILE *file);
+
+void free_test_tree_header(struct tree_header* header);
+
+void free_test_tuple(struct tuple* tuple);
+
+void *malloc_test(size_t size);
+
+void free_test(void *ptr);
+
+void print_ram();
+
+enum file_read_status read_tree_header(struct tree_header *header, FILE *file);
 
 #endif

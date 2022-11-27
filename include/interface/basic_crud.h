@@ -102,6 +102,8 @@ enum crud_operation_status offset_to_id(FILE *file, uint64_t* id, uint64_t offse
  */
 enum crud_operation_status change_string_tuple(FILE *file, uint64_t offset, char *new_string,  uint64_t size);
 
+enum crud_operation_status link_strings_to_tuple(FILE *file, struct tuple *tpl, uint64_t tpl_offset);
+
 /**
  * Статус операции
  */

@@ -41,19 +41,19 @@ def create_data(data_type, count):
 
 def get_random_string():
     letters = string.ascii_lowercase
-    return "name=" + ''.join(random.choice(letters) for i in range(20)) + ' '
+    return ''.join(random.choice(letters) for i in range(20)) + ' '
 
 
 def get_random_integer():
-    return "age=" + str(random.randrange(1, 99999)) + ' '
+    return str(random.randrange(1, 99999)) + ' '
 
 
 def get_random_float():
-    return "height=" + str(round(random.uniform(1, 100), 5)) + ' '
+    return str(round(random.uniform(1, 100), 5)) + ' '
 
 
 def get_random_boolean():
-    return "male=" + str(bool(random.getrandbits(1))) + ' '
+    return str(bool(random.getrandbits(1))) + ' '
 
 
 def create_file(data):

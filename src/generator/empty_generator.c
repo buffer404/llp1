@@ -1,4 +1,4 @@
-#include "empty_generator.h"
+#include "../../include/generator/empty_generator.h"
 
 static void generate_empty_tree_subheader(struct tree_subheader *subheader, size_t pattern_size) {
     subheader->pattern_size = (uint64_t) pattern_size;
