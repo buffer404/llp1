@@ -10,7 +10,6 @@ struct result_list_tuple {
     struct result_list_tuple *prev;
     struct tuple *value;
     uint64_t id;
-    struct result_list_tuple *next;
 };
 
 /**

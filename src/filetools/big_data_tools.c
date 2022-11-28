@@ -1,13 +1,6 @@
 #include "../../include/filetools/big_data_tools.h"
 #include "../../include/interface/basic_crud.h"
 
-size_t get_real_id_array_size(uint64_t pattern_size, uint64_t cur_id){
-    size_t real_tuple_size = get_real_tuple_size(pattern_size);
-    if (cur_id == 0) cur_id++;
-    return (cur_id * OFFSET_VALUE_SIZE / real_tuple_size) * real_tuple_size +
-           cur_id * OFFSET_VALUE_SIZE % real_tuple_size ? real_tuple_size : 0;
-}
-
 size_t get_real_tuple_size(uint64_t pattern_size) {
     return pattern_size * SINGLE_TUPLE_VALUE_SIZE < MINIMAL_TUPLE_SIZE
            ? MINIMAL_TUPLE_SIZE
@@ -78,18 +71,9 @@ enum file_read_status read_tree_header(struct tree_header *header, FILE *file) {
 enum file_read_status read_basic_tuple(FILE *file, struct tuple **tuple, uint64_t pattern_size) {
     union tuple_header *header = malloc_test(sizeof(union tuple_header));
     enum file_read_status code = read_from_file(file, header, sizeof(union tuple_header));
-//    if (header->alloc) {
-//        *tuple = (struct tuple *)header->alloc;
-//        free_test(header);
-//        return code;
-//    }
-//    fseek(file, -(sizeof(union tuple_header)), SEEK_CUR);
     struct tuple *temp_tuple = malloc_test(sizeof(struct tuple));
     temp_tuple->header = *header;
-//    header->alloc = (uint64_t) temp_tuple;
-//    write_to_file(file, header, sizeof(union tuple_header));
     free_test(header);
-
 
     uint64_t *data = malloc_test(get_real_tuple_size(pattern_size));
     code |= read_from_file(file, data, get_real_tuple_size(pattern_size));
@@ -210,6 +194,7 @@ enum file_write_status write_tuple(FILE *file, struct tuple *tuple, size_t tuple
     free_test(tuple_header);
 
     code |= write_to_file(file, tuple->data, tuple_size);
+    fflush(file);
     return code;
 }
 
@@ -232,11 +217,11 @@ void print_tree_header_from_file(FILE *file) {
     printf("--- ID ARRAY ---\n");
 
     size_t real_id_array_size = get_id_array_size(header->subheader->pattern_size, header->subheader->cur_id);
-    for (size_t iter = 0; iter < (header->subheader->cur_id / PRINT_ID_ARRAY_LEN); iter++) {
-        for (size_t inner_iter = 0; inner_iter < PRINT_ID_ARRAY_LEN; inner_iter++) {
-            //printf("%ld", iter * PRINT_ID_ARRAY_LEN + inner_iter);
-            printf("%16lx ", header->id_sequence[iter * PRINT_ID_ARRAY_LEN + inner_iter]);
-        }
+    for (size_t iter = 0; iter < header->subheader->cur_id; iter++) {
+//        for (size_t inner_iter = 0; inner_iter < PRINT_ID_ARRAY_LEN; inner_iter++) {
+//            //printf("%ld", iter * PRINT_ID_ARRAY_LEN + inner_iter);
+            printf("%16lx ", header->id_sequence[iter]);
+//        }
         printf("\n");
     }
 
@@ -251,12 +236,13 @@ void print_tuple_array_from_file(FILE *file) {
     get_types(file, &types, &size);
     struct tuple *cur_tuple;
 
-    for (size_t i = 0; i < header.subheader->cur_id; i++) {
+    for (size_t i = 1; i < header.subheader->cur_id; i++) {
         if (header.id_sequence[i] == NULL_VALUE) continue;
         fseek(file, header.id_sequence[i], SEEK_SET);
         read_basic_tuple(file, &cur_tuple, size);
         printf("--- TUPLE %3zu ---\n", i);
         for (size_t iter = 0; iter < size; iter++) {
+
             if (types[iter] == STRING_TYPE) {
                 char *s;
                 read_string_from_tuple(file, &s, header.subheader->pattern_size, cur_tuple->data[iter]);
@@ -277,20 +263,20 @@ void print_tuple_array_from_file(FILE *file) {
 
 void free_test_tree_header(struct tree_header* header){
     for (size_t iter = 0; iter < header->subheader->pattern_size; iter++){
-        free_test(header->pattern[iter]->key_value);
-        free_test(header->pattern[iter]->header);
-        free_test(header->pattern[iter]);
+        free(header->pattern[iter]->key_value);
+        free(header->pattern[iter]->header);
+        free(header->pattern[iter]);
     }
 
-    free_test(header->pattern);
-    free_test(header->id_sequence);
-    free_test(header->subheader);
-    free_test(header);
+    free(header->pattern);
+    free(header->id_sequence);
+    free(header->subheader);
+    free(header);
 }
 
 void free_test_tuple(struct tuple* tuple){
-    free_test(tuple->data);
-    free_test(tuple);
+    free(tuple->data);
+    free(tuple);
 }
 struct map_data {
     void *ptr;

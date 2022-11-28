@@ -36,8 +36,8 @@ void generate_empty_tree_header(char **pattern, uint32_t *types,size_t pattern_s
     header->pattern = malloc(sizeof(struct key*) * pattern_size);
     generate_empty_pattern(header->pattern, pattern, types, pattern_size, key_sizes);
 
-    header->id_sequence = malloc(sizeof(uint64_t) * get_real_id_array_size(header->subheader->pattern_size, header->subheader->cur_id));
-    for(size_t iter = 0; iter < get_real_id_array_size(header->subheader->pattern_size, header->subheader->cur_id); iter++){
+    header->id_sequence = malloc(sizeof(uint64_t) * get_id_array_size(header->subheader->pattern_size, header->subheader->cur_id));
+    for(size_t iter = 0; iter < get_id_array_size(header->subheader->pattern_size, header->subheader->cur_id); iter++){
         header->id_sequence[iter] = 0;
     }
 }

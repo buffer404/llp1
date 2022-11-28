@@ -5,8 +5,12 @@ enum crud_operation_status add_tuple(FILE *file, uint64_t *fields, uint64_t pare
     size_t size;
     get_types(file, &types, &size);
     struct tuple *new_tuple = malloc(sizeof(struct tuple));
-    union tuple_header new_tuple_header = {.parent = parent_id, .alloc = (uint64_t) new_tuple};
+    struct tree_header* header = malloc(sizeof(struct tree_header));
+    read_tree_header(header, file);
+    union tuple_header new_tuple_header = {.parent = parent_id, .alloc = (uint64_t) header->subheader->cur_id};
     new_tuple->header = new_tuple_header;
+
+
     new_tuple->data = malloc(size);
     uint64_t *link = malloc(sizeof(uint64_t));
     for (size_t iter = 0; iter < size; iter++) {
@@ -20,6 +24,7 @@ enum crud_operation_status add_tuple(FILE *file, uint64_t *fields, uint64_t pare
     size_t full_tuple_size = sizeof(union tuple_header) + get_real_tuple_size(size);
     enum crud_operation_status status = insert_new_tuple(file, new_tuple, full_tuple_size, link);
     append_to_id_array(file, *link);
+    free_test_tree_header(header);
     return status;
 }
 
@@ -109,14 +114,10 @@ enum crud_operation_status swap_last_tuple_to(FILE *file, uint64_t pos_to, size_
 static void append_to_result_list(struct tuple **tuple_to_add, uint64_t id, struct result_list_tuple **result) {
     if ((*result) == NULL) {
         *result = malloc(sizeof(struct result_list_tuple));
-        (*result)->prev = (*result);
-        (*result)->next = (*result);
+        (*result)->prev = NULL;
     } else {
         struct result_list_tuple *new_result = malloc(sizeof(struct result_list_tuple));
-        (*result)->prev->next = new_result;
-        (*result)->prev = new_result;
-        new_result->prev = (*result)->prev;
-        new_result->next = *result;
+        new_result->prev = *result;
         *result = new_result;
     }
     (*result)->value = *tuple_to_add;
@@ -161,7 +162,7 @@ enum crud_operation_status find_by_parent(FILE *file, uint64_t parent_id, struct
     for (size_t i = 0; i < header->subheader->cur_id; i++) {
         if (header->id_sequence[i] == NULL_VALUE) continue;
         fseek(file, header->id_sequence[i], SEEK_SET);
-        read_basic_tuple(&cur_tuple, file, header->subheader->pattern_size);
+        read_basic_tuple( file,&cur_tuple, header->subheader->pattern_size);
         if (cur_tuple->header.parent == parent_id) {
             append_to_result_list(&cur_tuple, i, result);
         }
@@ -182,7 +183,7 @@ enum crud_operation_status update_tuple(FILE *file, uint64_t field_number, uint6
     id_to_offset(file, id, &offset);
     struct tuple *cur_tuple = malloc(sizeof(struct tuple));
     fseek(file, offset, SEEK_SET);
-    read_basic_tuple(&cur_tuple, file, size);
+    read_basic_tuple(file, &cur_tuple,  size);
     if (type == STRING_TYPE) {
         change_string_tuple(file, cur_tuple->data[field_number], (char *) new_value, get_real_tuple_size(size));
     } else {

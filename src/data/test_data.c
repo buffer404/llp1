@@ -34,7 +34,7 @@ void get_test_data(FILE *file, size_t tuple_count, size_t pattern_size, uint32_t
     uint64_t* fields = malloc(sizeof(uint64_t *) * (pattern_size));
     uint64_t parent_id;
 
-    for (int tuple_idx = 0; tuple_idx < tuple_count; ++tuple_idx) {
+    for (int tuple_idx = 0; tuple_idx < tuple_count; tuple_idx++) {
         cur_line = get_cur_line(df);
         parent_id = get_parent_id(cur_line);
 
@@ -58,6 +58,7 @@ void get_test_data(FILE *file, size_t tuple_count, size_t pattern_size, uint32_t
 
         add_tuple(file, fields, parent_id);
     }
+
     fclose(df);
 }
 
