@@ -168,19 +168,19 @@ size_t append_to_id_array(FILE *file, uint64_t offset) {
     uint64_t from = ftell(file);
     uint64_t real_tuple_size = get_id_array_size(header->subheader->pattern_size, header->subheader->cur_id);
 
-    if (!((header->subheader->cur_id + 1) % real_tuple_size)){
-        fseek(file, 0, SEEK_END);
-        uint64_t cur_end = ftell(file);
-        ftruncate(fileno(file), cur_end + get_real_tuple_size(header->subheader->pattern_size) + sizeof(union tuple_header));
-
-        swap_tuple_to(file, cur_end, from, get_real_tuple_size(header->subheader->pattern_size));
-
-
-
-        free_test_tree_header(header);
-        header = malloc_test(sizeof(struct tree_header));
-        read_tree_header(header, file);
-    }
+//    if (!((header->subheader->cur_id + 1) % real_tuple_size)){
+//        fseek(file, 0, SEEK_END);
+//        uint64_t cur_end = ftell(file);
+//        ftruncate(fileno(file), cur_end + get_real_tuple_size(header->subheader->pattern_size) + sizeof(union tuple_header));
+//
+//        swap_tuple_to(file, cur_end, from, get_real_tuple_size(header->subheader->pattern_size));
+//
+//
+//
+//        free_test_tree_header(header);
+//        header = malloc_test(sizeof(struct tree_header));
+//        read_tree_header(header, file);
+//    }
 
 
     header->id_sequence[header->subheader->cur_id] = offset;
