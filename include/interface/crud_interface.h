@@ -12,6 +12,8 @@ struct result_list_tuple {
     uint64_t id;
 };
 
+void print_result_list_tuple(struct result_list_tuple* result);
+
 /**
  * Добавление нового tuple
  * @param file файл

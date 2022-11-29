@@ -4,28 +4,39 @@ enum crud_operation_status add_tuple(FILE *file, uint64_t *fields, uint64_t pare
     uint32_t *types;
     size_t size;
     get_types(file, &types, &size);
-    struct tuple *new_tuple = malloc(sizeof(struct tuple));
     struct tree_header* header = malloc(sizeof(struct tree_header));
     read_tree_header(header, file);
-    union tuple_header new_tuple_header = {.parent = parent_id, .alloc = (uint64_t) header->subheader->cur_id};
+
+    struct tuple* new_tuple = malloc(sizeof(struct tuple));
+    union tuple_header new_tuple_header = {.parent = parent_id, .alloc = header->subheader->cur_id};
+
     new_tuple->header = new_tuple_header;
+    new_tuple->data = malloc(get_real_tuple_size(size));
+    uint64_t link;
 
 
-    new_tuple->data = malloc(size);
-    uint64_t *link = malloc(sizeof(uint64_t));
     for (size_t iter = 0; iter < size; iter++) {
         if (types[iter] == STRING_TYPE) {
-            insert_string_tuple(file, (char *) fields[iter], get_real_tuple_size(size), link);
-            new_tuple->data[iter] = *link;
+            insert_string_tuple(file, fields[iter], get_real_tuple_size(size), &link);
+            new_tuple->data[iter] = link;
         } else {
             new_tuple->data[iter] = (uint64_t) fields[iter];
         }
     }
     size_t full_tuple_size = sizeof(union tuple_header) + get_real_tuple_size(size);
-    enum crud_operation_status status = insert_new_tuple(file, new_tuple, full_tuple_size, link);
-    append_to_id_array(file, *link);
+
+    enum crud_operation_status status = insert_new_tuple(file, new_tuple, full_tuple_size, &link);
+
+    link_strings_to_tuple(file, new_tuple, link);
+
+    size_t id = append_to_id_array(file, link);
+
+    free(new_tuple->data);
     free_test_tree_header(header);
-    return status;
+    free(types);
+    //free(new_tuple);
+
+    return READ_OK;
 }
 
 enum crud_operation_status get_tuple(FILE *file, uint64_t **fields, uint64_t id) {
@@ -69,7 +80,8 @@ enum crud_operation_status remove_tuple(FILE *file, uint64_t id, uint8_t str_fla
                 fseek(file, (long) offset, SEEK_SET);
                 read_basic_tuple(file, &tpl, size);
                 remove_tuple(file, tpl->data[field_num], 1);
-                free_test_tuple(tpl);
+                free(tpl->data);
+                free(tpl);
             }
         }
 
@@ -89,11 +101,13 @@ enum crud_operation_status remove_tuple(FILE *file, uint64_t id, uint8_t str_fla
             read_string_tuple(file, &str_tpl, size);
             swap_last_tuple_to(file, id, get_real_tuple_size(size) + sizeof(union tuple_header));
             id = str_tpl->header.next;
-            free_test_tuple(str_tpl);
+            free(str_tpl->data);
+            free(str_tpl);
         }
 
     }
-    free_test(types);
+
+    free(types);
     return CRUD_OK;
 }
 
@@ -176,20 +190,20 @@ enum crud_operation_status update_tuple(FILE *file, uint64_t field_number, uint6
     size_t size;
     get_types(file, &types, &size);
     uint64_t type = types[field_number];
-    struct tree_header *header = malloc(sizeof(struct tree_header));
-    size_t pos;
-    read_tree_header(header, file);
     uint64_t offset;
     id_to_offset(file, id, &offset);
-    struct tuple *cur_tuple = malloc(sizeof(struct tuple));
+    struct tuple *cur_tuple;
     fseek(file, offset, SEEK_SET);
-    read_basic_tuple(file, &cur_tuple,  size);
+    read_basic_tuple(file, &cur_tuple, size);
     if (type == STRING_TYPE) {
         change_string_tuple(file, cur_tuple->data[field_number], (char *) new_value, get_real_tuple_size(size));
     } else {
-        cur_tuple->data[field_number] = *new_value;
+        memcpy(&(cur_tuple->data[field_number]), new_value, sizeof(*new_value));
         fseek(file, offset, SEEK_SET);
-        write_tuple(file, cur_tuple, size);
+        write_tuple(file, cur_tuple, get_real_tuple_size(size));
     }
+    //free(cur_tuple->data);
+    //free(cur_tuple);
+    free(types);
     return 0;
 }

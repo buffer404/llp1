@@ -17,18 +17,28 @@ int main(int argc, char** argv) {
 
     get_test_data(file, *tuple_count, *pattern_size, types);
 
+    print_tree_header_from_file(file);
+
     uint64_t n = 86;
     struct result_list_tuple *result;
 
-    //find_by_parent()
+    //find_by_parent(file, 0, &result);
 
-    //remove_tuple(file, 1, 0);
+    //print_result_list_tuple(result);
 
-    //update_tuple(file, 1, &n, 0);
+    //remove_tuple(file, 1, 0); // 69 70
 
-    print_tree_header_from_file(file);
+    //update_tuple(file, 1, &n, 1);
+
+    //print_tree_header_from_file(file);
 
     print_tuple_array_from_file(file);
+
+    free(pattern_size);
+    free(tuple_count);
+    free(pattern);
+    free(types);
+    free(sizes);
 
     return 0;
 }
