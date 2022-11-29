@@ -11,6 +11,11 @@ enum crud_operation_status swap_tuple_to(FILE *file, uint64_t pos_to, uint64_t p
     size_t size;
     get_types(file, &types, &size);
 
+//    struct tree_header* header = malloc(sizeof(struct tree_header));
+//    read_tree_header(header, file);
+//    printf("--- SUBHEADER ---\n");
+//    printf("%-20s%ld\n", "ASCII Signature: ", header->subheader->ASCII_signature);
+
     if (pos_from != pos_to) {
         fseek(file, pos_from, SEEK_SET);
         void *buffer = malloc(tuple_size);
@@ -35,16 +40,20 @@ enum crud_operation_status swap_tuple_to(FILE *file, uint64_t pos_to, uint64_t p
             read_string_tuple(file, &tpl, size);
             union tuple_header *temp_header = malloc(sizeof(union tuple_header));
 
-            if (tpl->header.next != 0) {
-                fseek(file, tpl->header.next, SEEK_SET);
-                read_from_file(file, temp_header, sizeof(union tuple_header));
-                temp_header->prev = pos_to;
-                fseek(file, tpl->header.next, SEEK_SET);
-                write_to_file(file, temp_header, sizeof(union tuple_header));
-            }
+//            if (tpl->header.next != 0) {
+//                fseek(file, tpl->header.next, SEEK_SET);
+//                read_from_file(file, temp_header, sizeof(union tuple_header));
+//                temp_header->prev = pos_to;
+//                fseek(file, tpl->header.next, SEEK_SET);
+//
+//                printf("%lu\n", ftell(file));
+//
+//                write_to_file(file, temp_header, sizeof(union tuple_header));
+//            }
 
             fseek(file, tpl->header.prev, SEEK_SET);
             read_from_file(file, temp_header, sizeof(union tuple_header));
+
             if (temp_header->next == pos_from) {
                 temp_header->next = pos_to;
                 fseek(file, tpl->header.prev, SEEK_SET);
@@ -81,6 +90,7 @@ enum crud_operation_status swap_tuple_to(FILE *file, uint64_t pos_to, uint64_t p
         free_test_tree_header(header);
 
     }
+
     free_test(types);
     return CRUD_OK;
 }
@@ -215,6 +225,7 @@ enum crud_operation_status remove_from_id_array(FILE *file, uint64_t id, uint64_
         free(header);
         return CRUD_OK;
     }
+
 }
 
 enum crud_operation_status id_to_offset(FILE *file, uint64_t id, uint64_t* offset) {
@@ -287,7 +298,7 @@ enum crud_operation_status link_strings_to_tuple(FILE *file, struct tuple *tpl, 
             read_string_tuple(file, &str, size);
             str->header.prev = tpl_offset;
             fseek(file, tpl->data[iter], SEEK_SET);
-            write_tuple(file, str, size);
+            write_tuple(file, str, get_real_tuple_size(size));
 //            free(str->data);
 //            free(str);
         }

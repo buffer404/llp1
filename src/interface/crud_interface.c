@@ -12,28 +12,31 @@ enum crud_operation_status add_tuple(FILE *file, uint64_t *fields, uint64_t pare
 
     new_tuple->header = new_tuple_header;
     new_tuple->data = malloc(get_real_tuple_size(size));
-    uint64_t link;
+    uint64_t* link = malloc(sizeof(uint64_t));
 
 
     for (size_t iter = 0; iter < size; iter++) {
         if (types[iter] == STRING_TYPE) {
-            insert_string_tuple(file, fields[iter], get_real_tuple_size(size), &link);
-            new_tuple->data[iter] = link;
+            insert_string_tuple(file, fields[iter], get_real_tuple_size(size), link);
+            new_tuple->data[iter] = *link;
+
         } else {
             new_tuple->data[iter] = (uint64_t) fields[iter];
         }
     }
     size_t full_tuple_size = sizeof(union tuple_header) + get_real_tuple_size(size);
 
-    enum crud_operation_status status = insert_new_tuple(file, new_tuple, full_tuple_size, &link);
+    enum crud_operation_status status = insert_new_tuple(file, new_tuple, full_tuple_size, link);
 
-    link_strings_to_tuple(file, new_tuple, link);
+    link_strings_to_tuple(file, new_tuple, *link);
 
-    size_t id = append_to_id_array(file, link);
+    size_t id = append_to_id_array(file, *link);
 
     free(new_tuple->data);
     free_test_tree_header(header);
     free(types);
+    free(new_tuple);
+
     //free(new_tuple);
 
     return READ_OK;
@@ -62,6 +65,7 @@ enum crud_operation_status get_tuple(FILE *file, uint64_t **fields, uint64_t id)
 }
 
 enum crud_operation_status remove_tuple(FILE *file, uint64_t id, uint8_t str_flag) {
+
     uint32_t *types;
     size_t size;
     get_types(file, &types, &size);
@@ -85,7 +89,6 @@ enum crud_operation_status remove_tuple(FILE *file, uint64_t id, uint8_t str_fla
             }
         }
 
-
         swap_last_tuple_to(file, offset, get_real_tuple_size(size));
 
         struct result_list_tuple *children = NULL;
@@ -94,17 +97,28 @@ enum crud_operation_status remove_tuple(FILE *file, uint64_t id, uint8_t str_fla
             remove_tuple(file, children->id, 0);
             children = children->prev;
         }
+
     } else {
         struct tuple *str_tpl;
         while (id != NULL_VALUE) {
+//            struct tree_header* header1 = malloc(sizeof(struct tree_header));
+//            read_tree_header(header1, file);
+//            printf("--- SUBHEADER ---\n");
+//            printf("%-20s%ld\n", "ASCII Signature: ", header1->subheader->ASCII_signature);
             fseek(file, id, SEEK_SET);
             read_string_tuple(file, &str_tpl, size);
+
+
             swap_last_tuple_to(file, id, get_real_tuple_size(size) + sizeof(union tuple_header));
+
+
             id = str_tpl->header.next;
             free(str_tpl->data);
             free(str_tpl);
+            struct tree_header* header = malloc(sizeof(struct tree_header));
+            read_tree_header(header, file);
+//            printf("%-20s%ld\n", "ASCII Signature: ", header->subheader->ASCII_signature);
         }
-
     }
 
     free(types);
@@ -112,6 +126,12 @@ enum crud_operation_status remove_tuple(FILE *file, uint64_t id, uint8_t str_fla
 }
 
 enum crud_operation_status swap_last_tuple_to(FILE *file, uint64_t pos_to, size_t tuple_size){
+
+//    struct tree_header* header = malloc(sizeof(struct tree_header));
+//    read_tree_header(header, file);
+//    printf("--- SUBHEADER ---\n");
+//    printf("%-20s%ld\n", "ASCII Signature: ", header->subheader->ASCII_signature);
+
     uint32_t *types;
     size_t size;
     get_types(file, &types, &size);
@@ -120,8 +140,17 @@ enum crud_operation_status swap_last_tuple_to(FILE *file, uint64_t pos_to, size_
     uint64_t pos_from = ftell(file);
 
     free_test(types);
+
     enum crud_operation_status status = swap_tuple_to(file, pos_to, pos_from, tuple_size);
+//
+//    read_tree_header(header, file);
+//    printf("%-20s%ld\n", "ASCII Signature: ", header->subheader->ASCII_signature);
+
     ftruncate(fileno(file), (long) pos_from);
+
+//    read_tree_header(header, file);
+//    printf("%-20s%ld\n", "ASCII Signature: ", header->subheader->ASCII_signature);
+
     return status;
 }
 

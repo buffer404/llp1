@@ -202,8 +202,8 @@ enum file_write_status write_tuple(FILE *file, struct tuple *tuple, size_t tuple
     code |= write_to_file(file, tuple->data, tuple_size);
     fflush(file);
 
-    free(tuple->data);
-    free(tuple);
+//    free(tuple->data);
+//    free(tuple);
 
     return code;
 }

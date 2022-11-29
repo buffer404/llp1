@@ -13,11 +13,10 @@ int main(int argc, char** argv) {
     size_t *sizes;
 
     get_test_header(&pattern, &types, pattern_size, &sizes, tuple_count);
-    init_empty_file(file, pattern, types, *pattern_size, sizes);
 
+    init_empty_file(file, pattern, types, *pattern_size, sizes);
     get_test_data(file, *tuple_count, *pattern_size, types);
 
-    print_tree_header_from_file(file);
 
     uint64_t n = 86;
     struct result_list_tuple *result;
@@ -26,13 +25,13 @@ int main(int argc, char** argv) {
 
     //print_result_list_tuple(result);
 
-    //remove_tuple(file, 1, 0); // 69 70
+    remove_tuple(file, 1, 0); // 69 70
 
     //update_tuple(file, 1, &n, 1);
 
-    //print_tree_header_from_file(file);
+    print_tree_header_from_file(file);
 
-    print_tuple_array_from_file(file);
+    //print_tuple_array_from_file(file);
 
     free(pattern_size);
     free(tuple_count);

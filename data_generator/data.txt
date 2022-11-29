@@ -1,4 +1,4 @@
-1 string:name integer:age float:height boolean:male
+110 string:name integer:age float:height boolean:male
 0 vwyaprjwmyswuyyenspu 21634 23.79602 False
 0 cpebnvmjqumzmoiuweag 80042 76.23297 True
 1 lygapfemtidbjxebvfbf 11271 23.91193 False
