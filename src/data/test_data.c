@@ -53,7 +53,8 @@ void get_test_data(FILE *file, size_t tuple_count, size_t pattern_size, uint32_t
             strcpy(cur_line, substr(cur_line, space-cur_line+1, strlen(cur_line)));
         }
 
-        time_add_wrapper(file, fields, parent_id);
+        add_tuple(file, fields, parent_id);
+
     }
     fclose(df);
 }

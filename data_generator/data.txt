@@ -1,4 +1,4 @@
-500 string:name integer:age float:height boolean:male
+1000 string:name integer:age float:height boolean:male
 0 qxhobbtivcjghockqzzj 99608 10.9653 True
 0 sndvvsehumgdtdmmwuew 47782 24.32894 False
 1 tgksfqemjjiysxreeqtz 57876 15.42315 True

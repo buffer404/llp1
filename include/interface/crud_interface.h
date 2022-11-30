@@ -12,6 +12,11 @@ struct result_list_tuple {
     uint64_t id;
 };
 
+//struct result_list_tuple_test {
+//    struct tuple *value;
+//    struct result_list_tuple *next;
+//};
+
 void print_result_list_tuple(struct result_list_tuple* result);
 
 /**

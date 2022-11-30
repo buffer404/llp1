@@ -1,4 +1,5 @@
 CC=gcc
+CFLAGS= -Wall -Isrc/ -Wextra -DDEBUG -g -o0
 
 SRCDIR=src
 TARGETDIR=.
@@ -18,4 +19,4 @@ $(EXECUTABLE): $(SOURCES)
 	$(CC) $(SOURCES) -o $@
 	
 clean:
-	del -rf  $(EXECUTABLE)
+	del -rf  $(EXECUTABLE).exe
