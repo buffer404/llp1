@@ -20,7 +20,7 @@ size_t get_id_array_size(uint64_t pattern_size, uint64_t cur_id) {
     size_t frac = (cur_id * OFFSET_VALUE_SIZE % real_tuple_size ? 1: 0);
     size_t value = max( (frac + whole) * real_tuple_size / OFFSET_VALUE_SIZE, MIN_ID_ARRAY_SIZE * real_tuple_size / OFFSET_VALUE_SIZE);
 //    printf("%zu %zu %zu %zu %zu %zu\n", pattern_size, cur_id, real_tuple_size, whole, frac, value);
-    return 1000;
+    return 2000;
 }
 
 static enum file_read_status read_tree_subheader(struct tree_subheader *header, FILE *file) {
@@ -186,13 +186,6 @@ enum file_write_status init_empty_file(FILE *file, char **pattern, uint32_t *typ
     return write_tree_header(file, header);
 }
 
-enum file_open_status open_file_anyway(FILE **file, char *filename){
-    enum file_open_status code = open_exist_file(filename, file);
-    if (code) {
-        code = open_new_file(filename, file);
-    }
-    return code;
-}
 enum file_write_status write_tuple(FILE *file, struct tuple *tuple, size_t tuple_size) {
     union tuple_header *tuple_header = malloc(sizeof(union tuple_header));
     *tuple_header = tuple->header;

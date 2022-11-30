@@ -51,7 +51,7 @@ enum crud_operation_status get_tuple(FILE *file, uint64_t **fields, uint64_t id)
     size_t size;
     get_types(file, &types, &size);
     fseek(file, offset, SEEK_SET);
-    read_basic_tuple(&cur_tuple, file, (uint64_t) size);
+    read_basic_tuple(file, &cur_tuple, (uint64_t) size);
     *fields = malloc(sizeof(uint64_t) * size);
     for (size_t iter = 0; iter < size; iter++) {
         if (types[iter] == STRING_TYPE) {
@@ -180,7 +180,7 @@ enum crud_operation_status find_by_field(FILE *file, uint64_t field_number, uint
     for (size_t i = 0; i < header->subheader->cur_id; i++) {
         if (header->id_sequence[i] == NULL_VALUE) continue;
         fseek(file, header->id_sequence[i], SEEK_SET);
-        read_basic_tuple(&cur_tuple, file, size);
+        read_basic_tuple(file, &cur_tuple, size);
         if (type == STRING_TYPE) {
             char *s;
             read_string_from_tuple(file, &s, size, cur_tuple->data[field_number]);

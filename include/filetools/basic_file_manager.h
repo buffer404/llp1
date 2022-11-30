@@ -36,6 +36,8 @@ enum file_open_status open_exist_file(char *filename, FILE **file);
  */
 enum file_open_status open_new_file(char *filename, FILE **file);
 
+enum file_open_status open_file_anyway(FILE **file, char *filename);
+
 /**
  * Закрытие файла
  * @param file файловый поток

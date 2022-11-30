@@ -2,11 +2,8 @@
 
 void get_test_header(char ***pattern, uint32_t **types, size_t* pattern_size, size_t **sizes, size_t* tuple_count){
     FILE *df = open_file();
-
     char *cur_line = get_cur_line(df);
-
     init_header_param(cur_line, tuple_count, pattern_size);
-
     malloc_header_struct(pattern_size, pattern, types, sizes);
 
     for (int iter = 0; iter < *pattern_size; ++iter) {
@@ -56,9 +53,7 @@ void get_test_data(FILE *file, size_t tuple_count, size_t pattern_size, uint32_t
             strcpy(cur_line, substr(cur_line, space-cur_line+1, strlen(cur_line)));
         }
 
-
-
-        add_tuple(file, fields, parent_id);
+        time_add_wrapper(file, fields, parent_id);
     }
     fclose(df);
 }
@@ -70,7 +65,7 @@ bool get_bool_attr(char* string){
 }
 
 void init_header_param(char *cur_line, size_t* tuple_count, size_t* pattern_size){
-    *tuple_count = atoi(substr(cur_line, 0, strchr(cur_line, ' ')-cur_line));
+    *tuple_count = strtol(substr(cur_line, 0, strchr(cur_line, ' ')-cur_line), NULL, 10);
     strcpy(cur_line, substr(cur_line, strchr(cur_line, ' ')-cur_line+1, strlen(cur_line)-1));
     *pattern_size = get_space_count(cur_line) + 1;
 }
@@ -98,7 +93,6 @@ FILE *open_file(){
     df = fopen ("data_generator/data.txt","r");
     if (df == NULL) {
         printf ("Файл не существует \n");
-        _Exit (EXIT_FAILURE);
     }
 }
 
@@ -135,7 +129,6 @@ uint64_t get_real_tuple_attr(int type, char *attr) {
         return (uint64_t) attr;
     } else{
         printf ("Неверный формат входных данных \n");
-        _Exit (EXIT_FAILURE);
     }
 }
 
@@ -150,7 +143,6 @@ int get_type_from_string(char* str_type){
         return STRING_TYPE;
     } else{
         printf ("Неверный формат входных данных \n");
-        _Exit (EXIT_FAILURE);
     }
 }
 

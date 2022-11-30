@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "../interface/configuration.h"
+#include "../perf/wrapper.h"
 
 void get_test_data(FILE *file, size_t tuple_count, size_t pattern_size, uint32_t *types);
 

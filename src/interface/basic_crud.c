@@ -268,7 +268,7 @@ enum crud_operation_status change_string_tuple(FILE *file, uint64_t offset, char
     do {
         offset = old_offset;
         fseek(file, offset, SEEK_SET);
-        read_basic_tuple(&cur_tuple, file, size);
+        read_basic_tuple(file, &cur_tuple, size);
         fseek(file, offset, SEEK_SET);
         cur_tuple->data = (uint64_t * )(new_string);
         new_string += size;

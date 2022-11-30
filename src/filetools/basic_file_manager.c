@@ -43,6 +43,14 @@ void close_file(FILE *file){
     fclose(file);
 }
 
+enum file_open_status open_file_anyway(FILE **file, char *filename){
+    enum file_open_status code = open_exist_file(filename, file);
+    if (code == OPEN_FAILED) {
+        code = open_new_file(filename, file);
+    }
+    return code;
+}
+
 enum file_open_status open_empty_file(char *filename, FILE **file){
     //open_file(filename, file, "w");
     //close_file(*file);
