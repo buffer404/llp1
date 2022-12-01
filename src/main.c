@@ -16,10 +16,10 @@ int main(int argc, char** argv) {
 
     init_empty_file(file, pattern, types, *pattern_size, sizes);
 
-    get_test_data(file, *tuple_count, *pattern_size, types);
+    //get_test_data(file, *tuple_count, *pattern_size, types);
 
-    uint64_t n = 86;
-    struct result_list_tuple *result;
+    //uint64_t n = 86;
+    //struct result_list_tuple *result;
 
     //find_by_parent(file, 0, &result);
 
@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 
     print_tree_header_from_file(file);
 
-    print_tuple_array_from_file(file);
+    //print_tuple_array_from_file(file);
 
     free(pattern_size);
     free(tuple_count);

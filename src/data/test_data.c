@@ -3,24 +3,22 @@
 void get_test_header(char ***pattern, uint32_t **types, size_t* pattern_size, size_t **sizes, size_t* tuple_count){
     FILE *df = open_file();
     char *cur_line = get_cur_line(df);
-    init_header_param(cur_line, tuple_count, pattern_size);
+    init_header_param(&cur_line, tuple_count, pattern_size);
     malloc_header_struct(pattern_size, pattern, types, sizes);
 
-    for (int iter = 0; iter < *pattern_size; ++iter) {
-        char* space = strchr(cur_line, ' ');
-        if (space == NULL){
-            space = strchr(cur_line, '\0')-1;
-        }
-        char* colon = strchr(cur_line, ':');
-
-        (*types)[iter] = get_type_from_string(substr(cur_line, 0, colon-cur_line));
-        (*pattern)[iter] = substr(cur_line, colon-cur_line+1, space-cur_line);
-        (*sizes)[iter] = (strlen(substr(cur_line, colon-cur_line+1, space-cur_line)))
-                /FILE_GRANULARITY + FILE_GRANULARITY;
-
-        strcpy(cur_line, substr(cur_line, space-cur_line+1, strlen(cur_line)));
+    cur_line = strtok(cur_line, " ");
+    int iter = 0;
+    while (cur_line != NULL){
+        (*types)[iter] = get_type_from_string(cur_line);
+        cur_line = strtok (NULL, " ");
+        printf("%d\n", (*types)[iter]);
+        (*pattern)[iter] = cur_line;
+        printf("%s\n", (*pattern)[iter]);
+        (*sizes)[iter] = (strlen(cur_line)) / FILE_GRANULARITY + FILE_GRANULARITY;
+        printf("%zu\n\n", (*sizes)[iter]);
+        iter++;
+        cur_line = strtok (NULL, " ");
     }
-
     fclose(df);
 }
 
@@ -65,10 +63,20 @@ bool get_bool_attr(char* string){
     } return false;
 }
 
-void init_header_param(char *cur_line, size_t* tuple_count, size_t* pattern_size){
-    *tuple_count = strtol(substr(cur_line, 0, strchr(cur_line, ' ')-cur_line), NULL, 10);
-    strcpy(cur_line, substr(cur_line, strchr(cur_line, ' ')-cur_line+1, strlen(cur_line)-1));
-    *pattern_size = get_space_count(cur_line) + 1;
+void init_header_param(char **cur_line, size_t* tuple_count, size_t* pattern_size){
+    char* tmp = malloc(sizeof(char) * strlen(*cur_line) +1);
+    strcpy(tmp, *cur_line);
+    char* count_str = strtok (tmp, " ");
+    *tuple_count = strtol(count_str, NULL, 10);
+
+    int count = 0;
+
+    while (strtok (NULL, " ")){
+        count++;
+    }
+    *pattern_size = count;
+    *cur_line = substr(*cur_line, strlen(count_str) + 1, strlen(*cur_line));
+    free(tmp);
 }
 
 void malloc_header_struct(size_t* pattern_size, char ***pattern, uint32_t **types, size_t **sizes){

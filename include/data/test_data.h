@@ -17,7 +17,7 @@ FILE *open_file();
 
 char* get_cur_line(FILE *df);
 
-void init_header_param(char *cur_line, size_t* tuple_count, size_t* pattern_size);
+void init_header_param(char **cur_line, size_t* tuple_count, size_t* pattern_size);
 
 void malloc_header_struct(size_t* pattern_size, char ***pattern, uint32_t **types, size_t **sizes);
 

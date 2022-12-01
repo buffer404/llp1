@@ -2,7 +2,7 @@ import sys
 import string
 import random
 
-available_types = {"string": "string:name", "integer": "integer:age", "float": "float:height", "boolean": "boolean:male"}
+available_types = {"string": "string name", "integer": "integer age", "float": "float height", "boolean": "boolean male"}
 
 def get_input():
     data_type = []
