@@ -134,12 +134,17 @@ enum crud_operation_status insert_string_tuple(FILE *file, char *string, size_t 
 
 void get_types(FILE *file, uint32_t **types, size_t *size) {
     fseek(file, 0, SEEK_SET);
+    printf("%d\n", 0);
     struct tree_header *header = malloc(sizeof(struct tree_header));
+    printf("%d\n", 0);
     read_tree_header(header, file);
+    printf("%d\n", 0);
     uint32_t *temp_types = malloc(header->subheader->pattern_size * sizeof(uint32_t));
+    printf("%d\n", 0);
     for (size_t iter = 0; iter < header->subheader->pattern_size; iter++) {
         temp_types[iter] = header->pattern[iter]->header->type;
     }
+    printf("%d\n", 0);
     *types = temp_types;
     *size = header->subheader->pattern_size;
     free(header);

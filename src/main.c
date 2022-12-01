@@ -3,7 +3,6 @@
 
 int main(int argc, char** argv) {
     FILE *file;
-
     open_file_anyway(&file, "simple.txt");
 
     size_t* pattern_size = malloc(sizeof(size_t));
@@ -14,9 +13,28 @@ int main(int argc, char** argv) {
 
     get_test_header(&pattern, &types, pattern_size, &sizes, tuple_count);
 
+//    printf("%zu\n", *pattern_size);
+//    printf("%zu\n", *tuple_count);
+
+
     init_empty_file(file, pattern, types, *pattern_size, sizes);
 
-    //get_test_data(file, *tuple_count, *pattern_size, types);
+
+//    char * line = NULL;
+//    size_t len = 0;
+//    ssize_t read;
+//    while ((read = getline(&line, &len, fp)) != -1) {
+//        printf("Retrieved line of length %zu:\n", read);
+//        printf("%s", line);
+//    }
+
+//    char* header_line2;
+//    size_t len2 = 0;
+//    getline(&header_line2, &len2, fd);
+//    printf("%s\n", header_line2);
+//    fclose(fd);
+//    printf("%d", 0);
+    get_test_data(file, *tuple_count, *pattern_size, types);
 
     //uint64_t n = 86;
     //struct result_list_tuple *result;
@@ -31,7 +49,7 @@ int main(int argc, char** argv) {
 
     print_tree_header_from_file(file);
 
-    //print_tuple_array_from_file(file);
+    print_tuple_array_from_file(file);
 
     free(pattern_size);
     free(tuple_count);
@@ -41,3 +59,5 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+
+

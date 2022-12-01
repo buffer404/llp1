@@ -14,18 +14,16 @@ void get_test_data(FILE *file, size_t tuple_count, size_t pattern_size, uint32_t
 void get_test_header(char ***pattern, uint32_t **types, size_t* pattern_size, size_t **sizes, size_t* tuple_count);
 
 FILE *open_file();
-
-char* get_cur_line(FILE *df);
+//
+//char* get_cur_line(FILE *df);
 
 void init_header_param(char **cur_line, size_t* tuple_count, size_t* pattern_size);
 
-void malloc_header_struct(size_t* pattern_size, char ***pattern, uint32_t **types, size_t **sizes);
+void malloc_header_struct(const size_t* pattern_size, char ***pattern, uint32_t **types, size_t **sizes);
 
 void check_input();
 
 int get_string_count(size_t* pattern_size);
-
-char* substr(const char *src, int m, int n);
 
 int get_type_from_string(char* str_type);
 
@@ -33,7 +31,7 @@ uint64_t get_real_tuple_attr(int type, char *attr);
 
 int get_space_count(char* string);
 
-int get_parent_id(char* string);
+uint64_t get_parent_id(char* string);
 
 bool get_bool_attr(char* string);
 

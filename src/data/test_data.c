@@ -1,60 +1,67 @@
 #include "../../include/data/test_data.h"
 
+
 void get_test_header(char ***pattern, uint32_t **types, size_t* pattern_size, size_t **sizes, size_t* tuple_count){
-    FILE *df = open_file();
-    char *cur_line = get_cur_line(df);
+    FILE* file_data = open_file();
+    char *cur_line;
+    size_t len = 0;
+    getline(&cur_line, &len, file_data);
+    printf("%s\n", cur_line);
     init_header_param(&cur_line, tuple_count, pattern_size);
     malloc_header_struct(pattern_size, pattern, types, sizes);
-
     cur_line = strtok(cur_line, " ");
+    cur_line = strtok (NULL, " ");
     int iter = 0;
     while (cur_line != NULL){
         (*types)[iter] = get_type_from_string(cur_line);
         cur_line = strtok (NULL, " ");
-        printf("%d\n", (*types)[iter]);
+
+//        if(iter == (int)(*pattern_size - 1)){
+//            cur_line = substr(cur_line, 0, (int) strlen(cur_line)-2);
+//        }
+
         (*pattern)[iter] = cur_line;
-        printf("%s\n", (*pattern)[iter]);
         (*sizes)[iter] = (strlen(cur_line)) / FILE_GRANULARITY + FILE_GRANULARITY;
-        printf("%zu\n\n", (*sizes)[iter]);
         iter++;
         cur_line = strtok (NULL, " ");
     }
-    fclose(df);
+
 }
 
 void get_test_data(FILE *file, size_t tuple_count, size_t pattern_size, uint32_t *types){
-    FILE *df = open_file();
-    char* cur_line = get_cur_line(df);
-
+    FILE* file_data = open_file();
     uint64_t* fields = malloc(sizeof(uint64_t *) * (pattern_size));
     uint64_t parent_id;
+    char* cur_line = malloc(sizeof(char) * 1024);
+    size_t len = 0;
+    getline(&cur_line, &len, file_data);
 
     for (int tuple_idx = 0; tuple_idx < tuple_count; tuple_idx++) {
-        cur_line = get_cur_line(df);
+        getline(&cur_line, &len, file_data);
+
+        printf("%s\n", cur_line);
+
+        cur_line = strtok(cur_line, " ");
         parent_id = get_parent_id(cur_line);
+        cur_line = strtok(NULL, " ");
 
-        strcpy(cur_line, substr(cur_line, strchr(cur_line, ' ')-cur_line+1, strlen(cur_line)));
-        for (int tuple_attr = 0; tuple_attr < pattern_size; ++tuple_attr) {
-            char* space = strchr(cur_line, ' ');
-            if (space == NULL){
-                space = strchr(cur_line, '\0') - 1;
-            }
-            char* attr = substr(cur_line, 0, space-cur_line);
-
-            if (types[tuple_attr] != FLOAT_TYPE){
-                fields[tuple_attr] = get_real_tuple_attr(types[tuple_attr], attr);
-            } else{
-                double var = strtod(attr, NULL);
+        printf("parent id %lu\n", parent_id);
+        int tuple_attr = 0;
+        while (cur_line != NULL) {
+            printf("%s\n", cur_line);
+            if (types[tuple_attr] != FLOAT_TYPE) {
+                fields[tuple_attr] = get_real_tuple_attr(types[tuple_attr], cur_line);
+            } else {
+                double var = strtod(cur_line, NULL);
                 memcpy(&fields[tuple_attr], &var, sizeof(var));
             }
-
-            strcpy(cur_line, substr(cur_line, space-cur_line+1, strlen(cur_line)));
+            tuple_attr++;
+            cur_line = strtok(NULL, " ");
         }
-
         add_tuple(file, fields, parent_id);
 
     }
-    fclose(df);
+    free(cur_line);
 }
 
 bool get_bool_attr(char* string){
@@ -64,80 +71,68 @@ bool get_bool_attr(char* string){
 }
 
 void init_header_param(char **cur_line, size_t* tuple_count, size_t* pattern_size){
-    char* tmp = malloc(sizeof(char) * strlen(*cur_line) +1);
+    char* tmp = malloc(sizeof(char) * strlen(*cur_line) + 1);
     strcpy(tmp, *cur_line);
     char* count_str = strtok (tmp, " ");
     *tuple_count = strtol(count_str, NULL, 10);
-
     int count = 0;
 
     while (strtok (NULL, " ")){
         count++;
     }
-    *pattern_size = count;
-    *cur_line = substr(*cur_line, strlen(count_str) + 1, strlen(*cur_line));
+    *pattern_size = count/2;
     free(tmp);
 }
 
-void malloc_header_struct(size_t* pattern_size, char ***pattern, uint32_t **types, size_t **sizes){
+void malloc_header_struct(const size_t* pattern_size, char ***pattern, uint32_t **types, size_t **sizes){
     *pattern = malloc(sizeof(char *) * (*pattern_size));
     *types = malloc(sizeof (uint32_t) * (*pattern_size));
     *sizes = malloc(sizeof (size_t) * (*pattern_size));
 }
 
-int get_parent_id(char* string){
-    return atoi(substr(string, 0, strchr(string, ' ')-string));
+uint64_t get_parent_id(char* string){
+    return strtol(string, NULL, 10);
 }
 
-char *get_cur_line(FILE *df) {
-    char *cur_line = "";
-    size_t len = 0;
-    ssize_t read;
-    getline(&cur_line, &len, df);
-    return cur_line;
-}
+//char *get_cur_line(FILE *df) {
+//    char *cur_line = "";
+//    size_t len = 0;
+//    getline(&cur_line, &len, df);
+//    return cur_line;
+//}
 
 FILE *open_file(){
     FILE *df;
     df = fopen ("data_generator/data.txt","r");
     if (df == NULL) {
-        printf ("Файл не существует \n");
+        printf ("The file does not exist\n");
     }
 }
 
-char* substr(const char *src, int m, int n) {
-    int len = n - m;
-    char *dest = (char*)malloc(sizeof(char) * (len + 1));
-
-    for (int i = m; i < n && (*(src + i) != '\0'); i++){
-        *dest = *(src + i);
-        dest++;
-    }
-
-    *dest = '\0';
-    return dest - len;
-}
-
-int get_space_count(char* string){
-    int spaces = 0;
-    for(int i = 0; string[i] != '\0'; i++){
-        if (string[i] == ' '){
-            spaces++;
-        }
-    }
-    return spaces;
-}
+//char* substr(const char *src, int m, int n) {
+//    printf("%d\n", 0);
+//    int len = n - m;
+//    char *dest = (char*)malloc(sizeof(char) * (len + 1));
+//    printf("%d\n", 0);
+//    for (int i = m; i < n && (*(src + i) != '\0'); i++){
+//        *dest = *(src + i);
+//        dest++;
+//    }
+//    printf("%d\n", 0);
+//    *dest = '\0';
+//    return dest - len;
+//}
 
 uint64_t get_real_tuple_attr(int type, char *attr) {
     double var;
     if (type == BOOLEAN_TYPE) {
         return (uint64_t) get_bool_attr(attr);
     } else if (type == INTEGER_TYPE) {
-        return (uint64_t) atoi(attr);
+        return (uint64_t) strtol(attr, NULL, 10);
     }  else if (type == STRING_TYPE) {
         return (uint64_t) attr;
     } else{
-        printf ("Неверный формат входных данных \n");
+        printf ("Invalid input data format\n");
     }
 }
 
@@ -151,7 +146,7 @@ int get_type_from_string(char* str_type){
     } else if (!strcmp(str_type, "string")){
         return STRING_TYPE;
     } else{
-        printf ("Неверный формат входных данных \n");
+        printf ("Invalid input data format\n");
     }
 }
 

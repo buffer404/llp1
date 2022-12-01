@@ -57,7 +57,7 @@ def get_random_boolean():
 
 
 def create_file(data):
-    file = open("../data_generator/data.txt", "w+")
+    file = open("data.txt", "w+")
     header = sys.argv[1] + ' '
     for types in map(str, list(sys.argv[2::])):
         header += (available_types[types] + ' ')

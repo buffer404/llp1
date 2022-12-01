@@ -16,6 +16,7 @@ run:
 
 build: $(SOURCES) $(EXECUTABLE)
 
+
 $(EXECUTABLE): $(SOURCES)
 	$(CC) $(CFLAGS) $(SOURCES) -o $@
 

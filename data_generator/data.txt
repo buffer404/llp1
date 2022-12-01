@@ -1,5 +1,5 @@
-1000 string name integer age float height boolean male
-0 lczocaviosfjutpklpox 2097 12.51018 False
+1 string name integer age float height boolean male
+9 lczocaviosfjutpklpox 2097 12.51018 False
 0 mffciwtjdsxwlcwqmfzw 63987 18.05631 False
 1 sbnvyrrgjfsufwfkmcan 74878 46.11527 False
 1 erjegwgqhmgklwgjkdyr 63143 36.89069 False
