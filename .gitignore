@@ -4,3 +4,5 @@ data_generator/.idea
 src/.idea/.idea
 cmake-build-debug/
 main
+*.txt
+*.jpg

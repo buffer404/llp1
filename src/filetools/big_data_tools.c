@@ -20,7 +20,7 @@ size_t get_id_array_size(uint64_t pattern_size, uint64_t cur_id) {
     size_t frac = (cur_id * OFFSET_VALUE_SIZE % real_tuple_size ? 1: 0);
     size_t value = max( (frac + whole) * real_tuple_size / OFFSET_VALUE_SIZE, MIN_ID_ARRAY_SIZE * real_tuple_size / OFFSET_VALUE_SIZE);
 //    printf("%zu %zu %zu %zu %zu %zu\n", pattern_size, cur_id, real_tuple_size, whole, frac, value);
-    return 2000;
+    return value;
 }
 
 static enum file_read_status read_tree_subheader(struct tree_subheader *header, FILE *file) {

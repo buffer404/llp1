@@ -15,11 +15,9 @@ void get_test_header(char ***pattern, uint32_t **types, size_t* pattern_size, si
     while (cur_line != NULL){
         (*types)[iter] = get_type_from_string(cur_line);
         cur_line = strtok (NULL, " ");
-
-//        if(iter == (int)(*pattern_size - 1)){
-//            cur_line = substr(cur_line, 0, (int) strlen(cur_line)-2);
-//        }
-
+        if (iter == *pattern_size-1){
+            //cur_line[strlen(cur_line)-1]=0;
+        }
         (*pattern)[iter] = cur_line;
         (*sizes)[iter] = (strlen(cur_line)) / FILE_GRANULARITY + FILE_GRANULARITY;
         iter++;
