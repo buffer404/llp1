@@ -6,7 +6,7 @@ void get_test_header(char ***pattern, uint32_t **types, size_t* pattern_size, si
     char *cur_line;
     size_t len = 0;
     getline(&cur_line, &len, file_data);
-    printf("%s\n", cur_line);
+    //printf("%s\n", cur_line);
     init_header_param(&cur_line, tuple_count, pattern_size);
     malloc_header_struct(pattern_size, pattern, types, sizes);
     cur_line = strtok(cur_line, " ");
@@ -39,16 +39,16 @@ void get_test_data(FILE *file, size_t tuple_count, size_t pattern_size, uint32_t
     for (int tuple_idx = 0; tuple_idx < tuple_count; tuple_idx++) {
         getline(&cur_line, &len, file_data);
 
-        printf("%s\n", cur_line);
+       // printf("%s\n", cur_line);
 
         cur_line = strtok(cur_line, " ");
         parent_id = get_parent_id(cur_line);
         cur_line = strtok(NULL, " ");
 
-        printf("parent id %lu\n", parent_id);
+        //printf("parent id %lu\n", parent_id);
         int tuple_attr = 0;
         while (cur_line != NULL) {
-            printf("%s\n", cur_line);
+            //printf("%s\n", cur_line);
             if (types[tuple_attr] != FLOAT_TYPE) {
                 fields[tuple_attr] = get_real_tuple_attr(types[tuple_attr], cur_line);
             } else {
@@ -58,8 +58,9 @@ void get_test_data(FILE *file, size_t tuple_count, size_t pattern_size, uint32_t
             tuple_attr++;
             cur_line = strtok(NULL, " ");
         }
+        //print_ram();
         add_tuple(file, fields, parent_id);
-
+        //print_ram();
     }
     free(cur_line);
 }

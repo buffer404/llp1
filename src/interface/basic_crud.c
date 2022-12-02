@@ -24,7 +24,7 @@ enum crud_operation_status swap_tuple_to(FILE *file, uint64_t pos_to, uint64_t p
 
         fseek(file, pos_to, SEEK_SET);
         write_to_file(file, buffer, tuple_size);
-        free_test(buffer);
+        free(buffer);
 
         fseek(file, 0, SEEK_SET);
         struct tree_header *header = malloc(sizeof(struct tree_header));
@@ -76,7 +76,7 @@ enum crud_operation_status swap_tuple_to(FILE *file, uint64_t pos_to, uint64_t p
 //                free(parent->data);
 //                free(parent);
             }
-            free_test(temp_header);
+            free(temp_header);
         } else {
             fseek(file, pos_from, SEEK_SET);
             read_basic_tuple(file, &tpl, size);
@@ -91,7 +91,7 @@ enum crud_operation_status swap_tuple_to(FILE *file, uint64_t pos_to, uint64_t p
 
     }
 
-    free_test(types);
+    free(types);
     return CRUD_OK;
 }
 
@@ -129,25 +129,21 @@ enum crud_operation_status insert_string_tuple(FILE *file, char *string, size_t 
         temp_tuple->data = (uint64_t *) (temp_tuple_content + tuple_size * iter);
         insert_new_tuple(file, temp_tuple, tuple_size + sizeof(union tuple_header), &fake_pos);
     }
+    free(temp_tuple);
     return 0;
 }
 
 void get_types(FILE *file, uint32_t **types, size_t *size) {
     fseek(file, 0, SEEK_SET);
-    printf("%d\n", 0);
     struct tree_header *header = malloc(sizeof(struct tree_header));
-    printf("%d\n", 0);
     read_tree_header(header, file);
-    printf("%d\n", 0);
     uint32_t *temp_types = malloc(header->subheader->pattern_size * sizeof(uint32_t));
-    printf("%d\n", 0);
     for (size_t iter = 0; iter < header->subheader->pattern_size; iter++) {
         temp_types[iter] = header->pattern[iter]->header->type;
     }
-    printf("%d\n", 0);
     *types = temp_types;
     *size = header->subheader->pattern_size;
-    free(header);
+    free_test_tree_header(header);
 }
 
 enum crud_operation_status change_parameter(FILE *file, enum tree_subheader_parameter parameter, uint64_t value) {
@@ -304,8 +300,7 @@ enum crud_operation_status link_strings_to_tuple(FILE *file, struct tuple *tpl, 
             str->header.prev = tpl_offset;
             fseek(file, tpl->data[iter], SEEK_SET);
             write_tuple(file, str, get_real_tuple_size(size));
-//            free(str->data);
-//            free(str);
+            free_test_tuple(str);
         }
     }
     free(types);

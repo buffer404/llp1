@@ -4,40 +4,42 @@ enum crud_operation_status add_tuple(FILE *file, uint64_t *fields, uint64_t pare
     uint32_t *types;
     size_t size;
     get_types(file, &types, &size);
-    printf("%d\n", 0);
     struct tree_header* header = malloc(sizeof(struct tree_header));
     read_tree_header(header, file);
+
     struct tuple* new_tuple = malloc(sizeof(struct tuple));
     union tuple_header new_tuple_header = {.parent = parent_id, .alloc = header->subheader->cur_id};
+
     new_tuple->header = new_tuple_header;
     new_tuple->data = malloc(get_real_tuple_size(size));
-    uint64_t* link = malloc(sizeof(uint64_t));
+    uint64_t link;
 
     for (size_t iter = 0; iter < size; iter++) {
         if (types[iter] == STRING_TYPE) {
-            insert_string_tuple(file, fields[iter], get_real_tuple_size(size), link);
-            new_tuple->data[iter] = *link;
-
+            insert_string_tuple(file, fields[iter], get_real_tuple_size(size), &link);
+            new_tuple->data[iter] = link;
         } else {
             new_tuple->data[iter] = (uint64_t) fields[iter];
         }
     }
+
+
     size_t full_tuple_size = sizeof(union tuple_header) + get_real_tuple_size(size);
-    printf("%d\n", 0);
-    enum crud_operation_status status = insert_new_tuple(file, new_tuple, full_tuple_size, link);
 
-    link_strings_to_tuple(file, new_tuple, *link);
+    enum crud_operation_status status = insert_new_tuple(file, new_tuple, full_tuple_size, &link);
 
-    size_t id = append_to_id_array(file, *link);
 
-    free(new_tuple->data);
-    free_test_tree_header(header);
+    link_strings_to_tuple(file, new_tuple, link);
+
+    size_t id = append_to_id_array(file, link);
+
+
+
+    free_test_tuple(new_tuple);
     free(types);
-    free(new_tuple);
+    free_test_tree_header(header);
 
-    //free(new_tuple);
-
-    return READ_OK;
+    return status;
 }
 
 enum crud_operation_status get_tuple(FILE *file, uint64_t **fields, uint64_t id) {
@@ -137,7 +139,7 @@ enum crud_operation_status swap_last_tuple_to(FILE *file, uint64_t pos_to, size_
     fseek(file, (long) -(get_real_tuple_size(size) + sizeof(union tuple_header)), SEEK_END);
     uint64_t pos_from = ftell(file);
 
-    free_test(types);
+    free(types);
 
     enum crud_operation_status status = swap_tuple_to(file, pos_to, pos_from, tuple_size);
 //

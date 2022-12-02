@@ -97,6 +97,8 @@ void free_test_tree_header(struct tree_header* header);
 
 void free_test_tuple(struct tuple* tuple);
 
+void *malloc_test(size_t size);
+
 void free_test(void *ptr);
 
 void print_ram();

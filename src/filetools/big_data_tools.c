@@ -20,7 +20,7 @@ size_t get_id_array_size(uint64_t pattern_size, uint64_t cur_id) {
     size_t frac = (cur_id * OFFSET_VALUE_SIZE % real_tuple_size ? 1: 0);
     size_t value = max( (frac + whole) * real_tuple_size / OFFSET_VALUE_SIZE, MIN_ID_ARRAY_SIZE * real_tuple_size / OFFSET_VALUE_SIZE);
 //    printf("%zu %zu %zu %zu %zu %zu\n", pattern_size, cur_id, real_tuple_size, whole, frac, value);
-    return 1000;
+    return 2000;
 }
 
 static enum file_read_status read_tree_subheader(struct tree_subheader *header, FILE *file) {
@@ -52,24 +52,19 @@ enum file_read_status read_tree_header(struct tree_header *header, FILE *file) {
     struct tree_subheader *subheader = malloc(sizeof(struct tree_subheader));
     enum file_read_status code = read_tree_subheader(subheader, file);
     header->subheader = subheader;
-
     struct key **array_of_key = malloc(sizeof(struct key *) * subheader->pattern_size);
     header->pattern = array_of_key;
     for (size_t iter = subheader->pattern_size; iter-- > 0; array_of_key++) {
         struct key *element_pattern = malloc(sizeof(struct key));
         code |= read_key(element_pattern, file);
         *array_of_key = element_pattern;
+        //free(element_pattern);
     }
 
     size_t real_id_array_size = get_id_array_size(header->subheader->pattern_size, header->subheader->cur_id);
     uint64_t *id_array = (uint64_t *) malloc(real_id_array_size * sizeof(uint64_t));
     header->id_sequence = id_array;
     code |= read_from_file(file, id_array, real_id_array_size * sizeof(uint64_t));
-
-//    free(subheader);
-//    free(array_of_key);
-//    free(id_array);
-
     return code;
 }
 
@@ -78,7 +73,7 @@ enum file_read_status read_basic_tuple(FILE *file, struct tuple **tuple, uint64_
     enum file_read_status code = read_from_file(file, header, sizeof(union tuple_header));
     struct tuple *temp_tuple = malloc(sizeof(struct tuple));
     temp_tuple->header = *header;
-    free_test(header);
+    free(header);
 
     uint64_t *data = malloc(get_real_tuple_size(pattern_size));
     code |= read_from_file(file, data, get_real_tuple_size(pattern_size));
@@ -94,7 +89,7 @@ enum file_read_status read_string_tuple(FILE *file, struct tuple **tuple, uint64
     enum file_read_status code = read_from_file(file, header, sizeof(union tuple_header));
     struct tuple *temp_tuple = malloc(sizeof(struct tuple));
     temp_tuple->header = *header;
-    free_test(header);
+    free(header);
 
     uint64_t *data = (uint64_t *) malloc(get_real_tuple_size(pattern_size));
     code |= read_from_file(file, data, get_real_tuple_size(pattern_size));
@@ -116,7 +111,7 @@ static size_t how_long_string_is(FILE *file, uint64_t offset) {
         read_from_file(file, temp_header, sizeof(union tuple_header));
         len++;
     }
-    free_test(temp_header);
+    free(temp_header);
     return len;
 }
 
@@ -193,11 +188,6 @@ enum file_write_status write_tuple(FILE *file, struct tuple *tuple, size_t tuple
     free(tuple_header);
 
     code |= write_to_file(file, tuple->data, tuple_size);
-    fflush(file);
-
-//    free(tuple->data);
-//    free(tuple);
-
     return code;
 }
 
@@ -249,7 +239,7 @@ void print_tuple_array_from_file(FILE *file) {
                 char *s;
                 read_string_from_tuple(file, &s, header.subheader->pattern_size, cur_tuple->data[iter]);
                 printf("%-20s %s\n", header.pattern[iter]->key_value, s);
-                free_test(s);
+                free(s);
             } else if (types[iter] == INTEGER_TYPE || types[iter] == BOOLEAN_TYPE) {
                 printf("%-20s %lu\n", header.pattern[iter]->key_value, cur_tuple->data[iter]);
             } else if (types[iter] == FLOAT_TYPE) {
@@ -261,7 +251,7 @@ void print_tuple_array_from_file(FILE *file) {
         free(cur_tuple->data);
         free(cur_tuple);
     }
-    free_test(types);
+    free(types);
 }
 
 void free_test_tree_header(struct tree_header* header){
@@ -290,15 +280,23 @@ struct map_data map[100000] = {0};
 size_t glob_size = 0;
 size_t iter = 0;
 
+void *malloc_test(size_t size){
+    glob_size += size;
+    void *ptr = malloc(size);
+    map[iter].ptr = ptr;
+    map[iter++].size = size;
+    return ptr;
+}
+
 void free_test(void *ptr){
     free(ptr);
-//    for(size_t i = 0; i < 100000; i++) {
-//        if (map[i].ptr == ptr) {
-//            glob_size -= map[i].size;
-//            map[i].ptr = 0;
-//            break;
-//        }
-//    }
+    for(size_t i = 0; i < 100000; i++) {
+        if (map[i].ptr == ptr) {
+            glob_size -= map[i].size;
+            map[i].ptr = 0;
+            break;
+        }
+    }
 }
 
 void print_ram() {
